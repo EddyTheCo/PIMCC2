@@ -113,7 +113,7 @@ TVectorD *lattice::v=nullptr;
     if(d==2)
     hpos=new TH2D("pos","",1000,-position::L.x.at(0)/2,position::L.x.at(0)/2,1000,-position::L.x.at(1)/2,position::L.x.at(1)/2);
     if(d==1)
-    hpos=new TH1D("pos","",10000,-position::L.x.at(0)/2,position::L.x.at(0)/2);
+    hpos=new TH1D("pos","",5,-position::L.x.at(0)/2,position::L.x.at(0)/2);
 
 }
 #endif

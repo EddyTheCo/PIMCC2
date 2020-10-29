@@ -91,9 +91,9 @@ while(del>1)
 return true;
  }
 
- inline bool NfindHead(size_t del,const string str)const
+ inline bool NfindHead(size_t del,const bool &isRight)const
  {
-    if(str=="right")
+    if(isRight)
     {
         const Site* ptr=Rbead->right;
         while(del>0)
@@ -158,7 +158,7 @@ inline size_t  CalculateNoWormLenght(void)const
      bool Wiggle(double dU);
      bool shiftParticle(double dU, const position& shift, const Site * const &str)const;
      void PrepareSwap(void)const;
-     bool swap(Site * const , const double& SumI, const double& SumZ, double dU, const string &direction);
+     bool swap(Site * const , const double& SumI, const double& SumZ, double dU, const bool &isRight);
 
 
 
@@ -211,15 +211,49 @@ inline size_t  CalculateNoWormLenght(void)const
             left=&(theParticles->at(LeftTi).at(LeftPa));
             right=&(theParticles->at(RightTi).at(RightPa));
 
+            double var;
+            vector<double> x;
+            for(size_t i=0;i<d;i++)
+            {
+                (* position::inFile)>>var;
+                x.push_back(var);
+
+            }
+            pos=position(x);
+            oldpos=pos;
+
+
         }
         else
         {
             left=&(theParticles->at((TimeSliceOnBead-1+NTimeSlices)%NTimeSlices).at(ParticleOnBead));
             right=&(theParticles->at((TimeSliceOnBead+1)%NTimeSlices).at(ParticleOnBead));
+
+
+            double var;
+            vector<double> x;
+            for(size_t i=0;i<d;i++)
+            {
+                if(TimeSliceOnBead==0)
+                {
+
+                         x.push_back(Constants::giveRanD(position::L.x.at(i))-position::L.x.at(i)/2);
+
+                }
+                else
+                {
+                    x.push_back(left->pos.x.at(i));
+
+                }
+         }
+            pos=position(x);
+            oldpos=pos;
         }
 
         up=&(theParticles->at(TimeSliceOnBead).at((ParticleOnBead+1)%NParti_));
         down=&(theParticles->at(TimeSliceOnBead).at((ParticleOnBead-1+NParti_)%NParti_));
+
+
     }
     inline void totalEnergy(void)const
     {
@@ -242,7 +276,7 @@ inline size_t  CalculateNoWormLenght(void)const
         switch ( giveRanI(4) ) {
                 case 0:
             {
-                    if(NfindHead(del,"right"))
+                    if(NfindHead(del,true))
                     Rbead->deleteToRight(del,0);
                     break;
             }
@@ -256,7 +290,7 @@ inline size_t  CalculateNoWormLenght(void)const
                 case 2:
             {
 
-                    if(NfindHead(del,"left"))
+                    if(NfindHead(del,false))
                     Lbead->deleteToLeft(del,0);
                     break;
             }
@@ -272,7 +306,7 @@ inline size_t  CalculateNoWormLenght(void)const
 
  }
     const static bool fourthOrder;
-inline void ChangeInU(const string str, double& dU ,double & U )const
+inline void ChangeInU(const bool & isRemove, double& dU ,double & U )const
 {
     const bool isEven=this->TimeSliceOnBead%2==0;
     position gU=position(0.);
@@ -287,12 +321,12 @@ inline void ChangeInU(const string str, double& dU ,double & U )const
         var=tao*U;
     }
 
-    if(str=="remove")
+    if(isRemove)
         {
             dU+=var;
              return ;
         }
-        if(str=="insert")
+        if(!isRemove)
         {            
             dU-=var;
              return ;
@@ -364,36 +398,36 @@ inline void ChangeInU(const string str, double& dU ,double & U )const
             step++;
         }
     }
-    inline Site* searchBead(const string str, size_t step)const
+    inline Site* searchBead(const bool & isRight, size_t step)const
     {
         Site* var=nullptr;
-        if(str=="right")
+        if(isRight)
          var=this->right;
-        if(str=="left")
+        if(!isRight)
             var=this->left;
         while (step>0) {
             if(var==Rbead||var==Lbead)
                 return nullptr;
-            if(str=="right")
+            if(isRight)
              var=var->right;
-            if(str=="left")
+            if(!isRight)
                 var=var->left;
             step--;
         }
 
         return var;
     }
-    inline Site* searchBeadForced(const string str, size_t step)const
+    inline Site* searchBeadForced(const bool & isRight, size_t step)const
     {
         Site* var=nullptr;
-        if(str=="right")
+        if(isRight)
          var=this->right;
-        if(str=="left")
+        if(!isRight)
             var=this->left;
         while (step>0) {
-            if(str=="right")
+            if(isRight)
              var=var->right;
-            if(str=="left")
+            if(!isRight)
                 var=var->left;
             step--;
         }

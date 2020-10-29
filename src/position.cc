@@ -34,40 +34,14 @@ position::position(const string str)
         {
             x.push_back(Constants::giveRanD(L.x.at(i))-L.x.at(i)/2);
         }
-    if(str=="ini")
-        for(size_t i=0;i<d;i++)
-        {
-            if(restart)
-            {
-                double var;
-                (*inFile)>>var;
-                x.push_back(var);
-            }
-            else
-            {
-                //double var;
 
-                //     (*inFile)>>var;
-                 //     x.push_back(var);
-                //x.push_back(0.);
-               if(i==2)
-	       {
-		       x.push_back(0.0);
-	       }
-	       else
-	       {
-		       x.push_back(Constants::giveRanD(L.x.at(i))-L.x.at(i)/2);
-	       }
-            }
-
-        }
 }
 
-position::position(const string str, const Site * const bead)
+position::position(const bool & isRight, const Site * const bead)
 {
     const Site* edge;
     double ab;
-    if(str=="right")
+    if(isRight)
     {
          edge=bead->Rbead;
          ab=edge->TimeSliceOnBead-static_cast<double>(bead->TimeSliceOnBead);
