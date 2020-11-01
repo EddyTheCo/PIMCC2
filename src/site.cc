@@ -83,7 +83,7 @@ bool Site::OpenWorm(const size_t step, const size_t ab, double dU, const positio
     else
     {
 
-        NOpenP++;
+
         if(eta*NParti_/(propagator(start,right->pos,ab,-dU)*position::volumen)>giveRanD(1.))
         {
             const auto Dist=pos-right->pos;
@@ -229,7 +229,7 @@ ChangeInU(true,dU,U);
 
             if(this==Lbead)dU+=mu*tao;
 
-            NMoveP++;
+
             if(exp(dU)>giveRanD(1.))
             {
                 if(this!=Lbead)
@@ -271,7 +271,7 @@ ChangeInU(true,dU,U);
             }
             else
             {
-                NMoveP++;
+
                 if(exp(dU)>giveRanD(1.))
                 {
                     active=false;
@@ -329,7 +329,7 @@ right->ChangeInU(false,dU,U);
             else
             {
 
-                NMoveP++;
+
                 if(exp(dU)>giveRanD(1.))
                 {
                     right->active=true;
@@ -411,7 +411,7 @@ dU+=mu*tao;
             else
             {
 
-                NMoveP++;
+
                 if(exp(dU)>giveRanD(1.))
                 {
                     left->active=true;

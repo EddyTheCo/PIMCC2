@@ -171,6 +171,7 @@ inline size_t  CalculateNoWormLenght(void)const
      }
      inline double propagator(const position& a, const position& b,const double& ab, const double& dU )const
      {
+
          return exp(-fact1(ab)-(a-b).norm()*fact2(ab)+dU);
 
      }

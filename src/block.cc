@@ -52,7 +52,7 @@ while(step<NSweeps)
             switch ((!isGrandCanonical)?giveRanI(2):giveRanI(3)) {
             case 0:
             {
-               //cout<<"closing worm"<<endl;
+              // cout<<"closing worm"<<endl;
                     start->NCloseP++;
 
                     if(start->Lbead->CloseWorm(0))
@@ -63,7 +63,8 @@ while(step<NSweeps)
             }
             case 1:
             {
-               //cout<<"MoveWorm"<<endl;
+              // cout<<"MoveWorm"<<endl;
+                start->NMoveP++;
                     start->MoveWorm();
                      break;
             }
@@ -96,7 +97,7 @@ while(step<NSweeps)
                 TSumOfdisplacement+=start->TEnergy;
                 TSumOfPotential+=start->TPotential;
                 TNumberOfParticles+=start->NParti_;
-                TWinding+=start->TWinding.norm();
+                TWinding+=start->TWinding.normxy();
                 measureCounter++;
             }
 
@@ -106,7 +107,8 @@ while(step<NSweeps)
 
                if(start->NParti_)
                {
-               //    cout<<"OpenWorm"<<endl;
+                //   cout<<"OpenWorm"<<endl;
+                    start->NOpenP++;
                    const size_t posiTimes=giveRanI(NTimeSlices-1) ;
                    const size_t posiParti=giveRanI(particles->at(posiTimes).size()-1);
                    const size_t var2=  giveRanI(MBar-2);
@@ -121,7 +123,7 @@ while(step<NSweeps)
                  if(start->NParti_)
                  {
 
-             //      cout<<"wiggle"<<endl;
+                  // cout<<"wiggle"<<endl;
 
                      const size_t posiTimes=giveRanI(NTimeSlices-1) ; //Choose a random time slice
                      const size_t posiParti=giveRanI(particles->at(posiTimes).size()-1); //Choose the particle
