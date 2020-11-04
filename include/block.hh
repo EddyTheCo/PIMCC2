@@ -16,7 +16,7 @@ using namespace std;
 class block
 {
     public:
-    block(array<vector<Site>,10000>* particles, const size_t &NTimeSlices,  const size_t &NSweeps, const bool &realB
+    block(array<vector<Site>,10000>* particles, const size_t &NTimeSlices,  const size_t &NSweeps
       #ifdef USEROOT
       ,  TH2D * const Greens
       #endif

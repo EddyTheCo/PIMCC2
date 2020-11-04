@@ -14,12 +14,13 @@ using namespace std;
 
 
 
-block::block(array<vector<Site>,10000>* particles, const size_t &NTimeSlices, const size_t &NSweeps, const bool &realB
+block::block(array<vector<Site>,10000>* particles, const size_t &NTimeSlices, const size_t &NSweeps
              #ifdef USEROOT
              , TH2D * const Greens
              #endif
              )
 {
+
 
 
 double TSumOfdisplacement=0,TSumOfPotential=0,TNumberOfParticles=0;
@@ -28,6 +29,8 @@ double TWinding=0;
 Site* const start=&(particles->at(0).at(0));
 
 
+size_t h=0;
+const int Warmup=ReadFromInput<int>(21);
 
 while(step<NSweeps)
 {
@@ -35,24 +38,36 @@ while(step<NSweeps)
 
 
 //start->printLattice();
-//cout<<start->NParti_<<" "<<step<<endl;
+//cout<<" Nparti="<<start->NParti_<<" Npartini="<<NPartiIni<<endl;
 
+if(!(h%1000)&&Warmup&&!isGrandCanonical)
+{
+    if(start->NClose*1./start->NCloseP<0.01)
+    {
+        Site::mu+=1;
+    }
+    if(start->NOpen*1./start->NOpenP<0.01)
+    {
+        Site::mu-=1;
+    }
+    cout<<"mu*******************************="<<Site::mu<<" "<<h<<endl;
+}
+h++;
 
          if(start->ThereIsAWorm)
         {
 
-             if(realB)
-             {
+
                 measureCounter1++;
                 TWormlenght+=start->NInactiveLinks();
 #ifdef USEROOT
                 Greens->Fill(sqrt((start->Rbead->pos-start->Lbead->pos).norm()),abs(1.*start->Rbead->TimeSliceOnBead-1.*start->Lbead->TimeSliceOnBead));
 #endif
-             }
+
             switch ((!isGrandCanonical)?giveRanI(2):giveRanI(3)) {
             case 0:
             {
-              // cout<<"closing worm"<<endl;
+               //cout<<"closing worm"<<endl;
                     start->NCloseP++;
 
                     if(start->Lbead->CloseWorm(0))
@@ -63,14 +78,14 @@ while(step<NSweeps)
             }
             case 1:
             {
-              // cout<<"MoveWorm"<<endl;
+               //cout<<"MoveWorm"<<endl;
                 start->NMoveP++;
                     start->MoveWorm();
                      break;
             }
             case 2:
             {
-              // cout<<"swap"<<endl;
+               //cout<<"swap"<<endl;
                 start->NSwapP++;
                if(start->NParti_>1)
                start->PrepareSwap();
@@ -92,14 +107,13 @@ while(step<NSweeps)
         }
         else
         {
-            if(realB)
-            {
+
                 TSumOfdisplacement+=start->TEnergy;
                 TSumOfPotential+=start->TPotential;
                 TNumberOfParticles+=start->NParti_;
                 TWinding+=start->TWinding.normxy();
                 measureCounter++;
-            }
+
 
              switch ((isGrandCanonical)?giveRanI(2):giveRanI(1)) {
              case 0:
@@ -107,7 +121,7 @@ while(step<NSweeps)
 
                if(start->NParti_)
                {
-                //   cout<<"OpenWorm"<<endl;
+                  // cout<<"OpenWorm"<<endl;
                     start->NOpenP++;
                    const size_t posiTimes=giveRanI(NTimeSlices-1) ;
                    const size_t posiParti=giveRanI(particles->at(posiTimes).size()-1);
@@ -123,7 +137,7 @@ while(step<NSweeps)
                  if(start->NParti_)
                  {
 
-                  // cout<<"wiggle"<<endl;
+                   //cout<<"wiggle"<<endl;
 
                      const size_t posiTimes=giveRanI(NTimeSlices-1) ; //Choose a random time slice
                      const size_t posiParti=giveRanI(particles->at(posiTimes).size()-1); //Choose the particle
@@ -156,14 +170,13 @@ while(step<NSweeps)
     }
 
 
-if(realB)
-{
+
         SumofDisplacement=TSumOfdisplacement/measureCounter;
         SumOfPotential=TSumOfPotential/measureCounter;
         NumberOfParticles=TNumberOfParticles/measureCounter;
         Wormlenght=1.*TWormlenght/measureCounter1;
         SumofWinding=TWinding/measureCounter;
-}
+
 
 }
 

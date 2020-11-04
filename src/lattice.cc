@@ -27,7 +27,7 @@ using namespace Constants;
 
 
 const size_t SAMPLING=ReadFromInput<size_t>(20);
-const size_t NPartiIni=(restart)?ReadFromInput<size_t>(1,".restart.conf"):ReadFromInput<size_t>(1);
+const size_t NPartiIni=ReadFromInput<size_t>(1);
 ofstream  lattice::thesweep("sweep",(restart)?std::ofstream::out | std::ofstream::app:std::ofstream::out),lattice::theratios("ratios",(restart)?std::ofstream::out | std::ofstream::app:std::ofstream::out);
 
 const bool isGrandCanonical=ReadFromInput<string>(11)=="GrandCanonical";
@@ -159,7 +159,7 @@ theratios<< left << setw(12)<<"Ropen"<<left << setw(12)<<"RClose"<<left << setw(
     for(size_t step=0;step<NRep;step++)
     {
 
-        const auto myBlock=block(grid,NTimeSlices,NSweeps,true
+        const auto myBlock=block(grid,NTimeSlices,NSweeps
 #ifdef USEROOT
                                  ,Greens
 #endif
@@ -170,6 +170,8 @@ cout<<"finished block "<<step<<endl;
                         (*v)[0]+1
 #endif
   );
+
+
 
 thesweep << left << setw(12) << myBlock.getKineticEnergy()<<" "<< left << setw(12) <<myBlock.SumOfPotential/(NTimeSlices)
          <<" "<< left << setw(12) << myBlock.getKineticEnergy()+myBlock.SumOfPotential/(NTimeSlices)
@@ -268,6 +270,7 @@ Constants::saveRandom();
    RestartPtrConf.close();
    rename(".restartVAR.conf", ".restart.conf");
    rename(".restartPtrVAR.conf", ".restartPtr.conf");
+
 
 
 }

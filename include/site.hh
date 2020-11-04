@@ -240,12 +240,13 @@ inline size_t  CalculateNoWormLenght(void)const
 
                          x.push_back(Constants::giveRanD(position::L.x.at(i))-position::L.x.at(i)/2);
 
+
                 }
                 else
                 {
                     x.push_back(left->pos.x.at(i));
-
                 }
+
          }
             pos=position(x);
             oldpos=pos;
