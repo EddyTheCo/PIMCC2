@@ -50,7 +50,7 @@ if(!(h%1000)&&Warmup&&!isGrandCanonical)
     {
         Site::mu-=1;
     }
-    cout<<"mu*******************************="<<Site::mu<<" "<<h<<endl;
+    cout<<"mu*******************************="<<Site::mu<<endl;
 }
 h++;
 
