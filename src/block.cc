@@ -40,17 +40,21 @@ while(step<NSweeps)
 //start->printLattice();
 //cout<<" Nparti="<<start->NParti_<<" Npartini="<<NPartiIni<<endl;
 
-    if(!(h%1000)&&Warmup&&!isGrandCanonical)
+    if(!(h%1000))
     {
-        if(start->NClose*1./start->NCloseP<0.1)
+        cout<<start->NClose*1./start->NCloseP<<" RO="<<start->NOpen*1./start->NOpenP<<endl;
+    }
+    if(!(h%100000)&&Warmup&&!isGrandCanonical)
+    {
+        if(start->NClose*1./start->NCloseP<0.01)
         {
             Site::mu+=1;
         }
-        if(start->NOpen*1./start->NOpenP<0.1)
+        if(start->NOpen*1./start->NOpenP<0.01)
         {
             Site::mu-=1;
         }
-        if(start->NClose*1./start->NCloseP<0.1&&start->NOpen*1./start->NOpenP<0.1)
+        if(start->NClose*1./start->NCloseP<0.01&&start->NOpen*1./start->NOpenP<0.01)
         {
             Site::eta++;
             if(start->NClose*1./start->NCloseP<start->NOpen*1./start->NOpenP)
@@ -65,7 +69,7 @@ while(step<NSweeps)
         cout<<"mu="<<Site::mu<<" eta="<<Site::eta<<" RC="<<start->NClose*1./start->NCloseP<<" RO="<<start->NOpen*1./start->NOpenP<<endl;
         start->restartRatios();
     }
-h++;
+    h++;
 
          if(start->ThereIsAWorm)
         {
