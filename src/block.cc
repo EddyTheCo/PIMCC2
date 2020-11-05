@@ -70,13 +70,14 @@ h++;
          if(start->ThereIsAWorm)
         {
 
-
-                measureCounter1++;
+                if(!Warmup)
+                {
+                    measureCounter1++;
                 TWormlenght+=start->NInactiveLinks();
 #ifdef USEROOT
                 Greens->Fill(sqrt((start->Rbead->pos-start->Lbead->pos).norm()),abs(1.*start->Rbead->TimeSliceOnBead-1.*start->Lbead->TimeSliceOnBead));
 #endif
-
+                }
             switch ((!isGrandCanonical)?giveRanI(2):giveRanI(3)) {
             case 0:
             {
@@ -120,12 +121,14 @@ h++;
         }
         else
         {
-
+             if(!Warmup)
+             {
                 TSumOfdisplacement+=start->TEnergy;
                 TSumOfPotential+=start->TPotential;
                 TNumberOfParticles+=start->NParti_;
                 TWinding+=start->TWinding.normxy();
                 measureCounter++;
+             }
 
 
              switch ((isGrandCanonical)?giveRanI(2):giveRanI(1)) {
@@ -183,13 +186,14 @@ h++;
     }
 
 
-
+if(!Warmup)
+{
         SumofDisplacement=TSumOfdisplacement/measureCounter;
         SumOfPotential=TSumOfPotential/measureCounter;
         NumberOfParticles=TNumberOfParticles/measureCounter;
         Wormlenght=1.*TWormlenght/measureCounter1;
         SumofWinding=TWinding/measureCounter;
-
+}
 
 }
 
