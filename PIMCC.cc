@@ -18,9 +18,9 @@ auto start = chrono::high_resolution_clock::now();
 if(ReadFromInput<string>(10)=="restart")    
 Constants::readRandom();
 else {
-int va=system("cp input .input.ini"); //Makes a copy of the input file
+int va=system("cp input .input.start"); //Makes a copy of the input file
 }
-
+int va=system("cp input .input.ini"); //Makes a copy of the input file
 
    auto theLattice=lattice();
 
