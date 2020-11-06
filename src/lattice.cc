@@ -27,7 +27,7 @@ using namespace Constants;
 
 
 const size_t SAMPLING=ReadFromInput<size_t>(20);
-const size_t NPartiIni=ReadFromInput<size_t>(1);
+const size_t NPartiIni=(restart)?ReadFromInput<size_t>(1,".restart.conf"):ReadFromInput<size_t>(1);
 ofstream  lattice::thesweep("sweep",(restart)?std::ofstream::out | std::ofstream::app:std::ofstream::out),lattice::theratios("ratios",(restart)?std::ofstream::out | std::ofstream::app:std::ofstream::out);
 
 const bool isGrandCanonical=ReadFromInput<string>(11)=="GrandCanonical";
@@ -270,7 +270,9 @@ Constants::saveRandom();
    RestartPtrConf.close();
    rename(".restartVAR.conf", ".restart.conf");
    rename(".restartPtrVAR.conf", ".restartPtr.conf");
-
+   ofstream muAndeta(".muAndeta");
+   muAndeta<<Site::mu<<" "<<Site::eta<<endl;
+    muAndeta.close();
 
 
 }

@@ -31,7 +31,7 @@ Site* const start=&(particles->at(0).at(0));
 
 size_t h=0;
 const int Warmup=ReadFromInput<int>(21);
-ofstream muAndeta(".muAndeta");
+
 
 while(step<NSweeps)
 {
@@ -45,34 +45,23 @@ while(step<NSweeps)
     {
         cout<<"RC="<<start->NClose*1./start->NCloseP<<" RO="<<start->NOpen*1./start->NOpenP<<endl;
     }
-    if(!(h%1000)&&Warmup&&!isGrandCanonical)
+    if(!(h%1000)&&Warmup&&isGrandCanonical)
     {
-        if(start->NClose*1./start->NCloseP<0.01)
+        if(start->NParti_<Warmup)
         {
-            Site::mu*=2;
+            Site::mu+=1;
         }
-        if(start->NOpen*1./start->NOpenP<0.01)
+        if(start->NParti_>Warmup)
         {
-            Site::mu*=0.3;
+            Site::mu-=1;
         }
-        if(start->NClose*1./start->NCloseP<0.01&&start->NOpen*1./start->NOpenP<0.01)
-        {
-            Site::eta*=2;
-            if(start->NClose*1./start->NCloseP<start->NOpen*1./start->NOpenP)
-            {
-                Site::mu*=2;
-            }
-            else
-            {
-                Site::mu*=0.3;
-            }
-        }
-        cout<<"mu="<<Site::mu<<" eta="<<Site::eta<<" RC="<<start->NClose*1./start->NCloseP<<" RO="<<start->NOpen*1./start->NOpenP<<endl;
-        muAndeta<<Site::mu<<" "<<Site::eta<<endl;
-        start->restartRatios();
+
+        cout<<"mu="<<Site::mu<<" Npar="<<start->NParti_<<endl;
+
 
     }
     h++;
+
 
          if(start->ThereIsAWorm)
         {
@@ -194,7 +183,7 @@ while(step<NSweeps)
 
     }
 
-muAndeta.close();
+
 if(!Warmup)
 {
         SumofDisplacement=TSumOfdisplacement/measureCounter;
