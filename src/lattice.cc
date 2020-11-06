@@ -258,7 +258,7 @@ void lattice::PrintConfiguration (
 
        (*v).Write("v",TObject::kOverwrite);
 
-       hpos->Write(("pos" + to_string(step)).c_str());
+        hpos->Write(("pos" + to_string(step%1000)).c_str(),TObject::kOverwrite);
         hpos->Reset("ICESM");
 
    gDirectory->Write("", TObject::kOverwrite);
