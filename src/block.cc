@@ -31,6 +31,7 @@ Site* const start=&(particles->at(0).at(0));
 
 size_t h=0;
 const int Warmup=ReadFromInput<int>(21);
+ofstream muAndeta(".muAndeta");
 
 while(step<NSweeps)
 {
@@ -67,7 +68,9 @@ while(step<NSweeps)
             }
         }
         cout<<"mu="<<Site::mu<<" eta="<<Site::eta<<" RC="<<start->NClose*1./start->NCloseP<<" RO="<<start->NOpen*1./start->NOpenP<<endl;
+        muAndeta<<Site::mu<<" "<<Site::eta<<endl;
         start->restartRatios();
+
     }
     h++;
 
@@ -87,10 +90,12 @@ while(step<NSweeps)
             {
                //cout<<"closing worm"<<endl;
                     start->NCloseP++;
-
+                    if(!(start->cantClose(MBar)))
+                    {
                     if(start->Lbead->CloseWorm(0))
                     {
                         step++;
+                    }
                     }
                 break;
             }
@@ -189,7 +194,7 @@ while(step<NSweeps)
 
     }
 
-
+muAndeta.close();
 if(!Warmup)
 {
         SumofDisplacement=TSumOfdisplacement/measureCounter;

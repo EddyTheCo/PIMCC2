@@ -101,7 +101,7 @@ bool Site::OpenWorm(const size_t step, const size_t ab, double dU, const positio
 bool Site::CloseWorm(double dU)
 {
 
-    if(cantClose(MBar))return false;
+
 
     dU+=mu*tao;
 
