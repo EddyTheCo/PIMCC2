@@ -4,8 +4,8 @@
 using namespace std;
 
 
-#define D1
-#define TYP TH1D
+#define D3
+#define TYP TH3D
 
 TVectorD *v=nullptr;
 TFile *MyFile = new TFile("RootFile.root","UPDATE");

@@ -20,7 +20,8 @@
 using namespace std;
 
 
-extern const bool isGrandCanonical,restart;
+extern const bool restart;
+extern  bool isGrandCanonical;
 
 extern const size_t NPartiIni,SAMPLING;
 class lattice

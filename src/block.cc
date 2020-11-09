@@ -30,8 +30,8 @@ Site* const start=&(particles->at(0).at(0));
 
 
 size_t h=0;
-const int Warmup=ReadFromInput<int>(21);
-
+static int Warmup=ReadFromInput<int>(21);
+static size_t st=0;
 
 while(step<NSweeps)
 {
@@ -45,18 +45,14 @@ while(step<NSweeps)
     {
         cout<<"RC="<<start->NClose*1./start->NCloseP<<" RO="<<start->NOpen*1./start->NOpenP<<endl;
     }
-    if(!(h%1000)&&Warmup&&isGrandCanonical)
+    if(!(h%1000)&&Warmup&&!isGrandCanonical)
     {
-        if(start->NParti_<Warmup)
+        if(start->NClose*1./start->NCloseP<0.001)
         {
             Site::mu+=1;
         }
-        if(start->NParti_>Warmup)
-        {
-            Site::mu-=1;
-        }
 
-        cout<<"mu="<<Site::mu<<" Npar="<<start->NParti_<<endl;
+        cout<<"mu="<<Site::mu<<" eta="<<Site::eta<<" Npar="<<start->NParti_<<endl;
 
 
     }
