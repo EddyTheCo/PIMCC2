@@ -80,6 +80,7 @@ while(step<NSweeps)
                     if(start->Lbead->CloseWorm(0))
                     {
                         step++;
+                        if(Warmup)start->restartRatios();
                     }
                     }
                 break;
