@@ -31,7 +31,6 @@ Site* const start=&(particles->at(0).at(0));
 
 size_t h=0;
 size_t War=Warmup;
-static size_t st=0;
 static size_t CorrectNpart=0;
 while(step<NSweeps)
 {
@@ -50,7 +49,7 @@ while(step<NSweeps)
         }
         if(start->NParti_>War)
         {
-            Site::mu-=0.5;
+            Site::mu-=1;
         }
         if(start->NParti_==War)
         {
