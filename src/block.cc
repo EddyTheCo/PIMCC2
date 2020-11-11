@@ -30,9 +30,9 @@ Site* const start=&(particles->at(0).at(0));
 
 
 size_t h=0;
-static int Warmup=ReadFromInput<int>(21);
+size_t War=Warmup;
 static size_t st=0;
-
+static size_t CorrectNpart=0;
 while(step<NSweeps)
 {
 
@@ -41,18 +41,29 @@ while(step<NSweeps)
 //start->printLattice();
 //cout<<" Nparti="<<start->NParti_<<" Npartini="<<NPartiIni<<endl;
 
-    if(!(h%1000))
+
+    if(!(h%1000)&&War&&isGrandCanonical)
     {
-        cout<<"RC="<<start->NClose*1./start->NCloseP<<" RO="<<start->NOpen*1./start->NOpenP<<endl;
-    }
-    if(!(h%1000)&&Warmup&&!isGrandCanonical&&start->ThereIsAWorm)
-    {
-        if(start->NClose*1./start->NCloseP<0.001)
+        if(start->NParti_<War)
         {
             Site::mu+=1;
         }
+        if(start->NParti_>War)
+        {
+            Site::mu-=0.5;
+        }
+        if(start->NParti_==War)
+        {
+            CorrectNpart++;
+            if(CorrectNpart==100)
+            {
+                War=0;
+                isGrandCanonical=0;
 
-        cout<<"mu="<<Site::mu<<" eta="<<Site::eta<<" Npar="<<start->NParti_<<endl;
+            }
+        }
+
+        cout<<"mu="<<Site::mu<<" eta="<<Site::eta<<" Npar="<<start->NParti_<<" C="<<CorrectNpart<<endl;
 
 
     }
@@ -80,7 +91,7 @@ while(step<NSweeps)
                     if(start->Lbead->CloseWorm(0))
                     {
                         step++;
-                        if(Warmup)start->restartRatios();
+
                     }
                     }
                 break;
@@ -188,6 +199,10 @@ if(!Warmup)
         NumberOfParticles=TNumberOfParticles/measureCounter;
         Wormlenght=1.*TWormlenght/measureCounter1;
         SumofWinding=TWinding/measureCounter;
+}
+if(!War&&Warmup)
+{
+    Warmup=0;
 }
 
 }

@@ -27,7 +27,12 @@ int va=system("cp input .input.ini"); //Makes a copy of the input file
     theLattice.setup();
 
 
-
+if(size_t Warmup=ReadFromInput<int>(21))
+{
+    cout<<"Starting The WarmingUp"<<endl;
+    theLattice.Warm();
+    cout<<"Finishing The WarmingUp"<<endl;
+}
     theLattice.move();
 
 auto finish = std::chrono::high_resolution_clock::now();

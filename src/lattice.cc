@@ -7,6 +7,8 @@
 #include<stack>
 #include <cstring>
 #include <cstdio>
+#include <stdio.h>
+#include <stdlib.h>
 
 
 const bool restart=ReadFromInput<string>(10)=="restart";
@@ -29,7 +31,7 @@ using namespace Constants;
 const size_t SAMPLING=ReadFromInput<size_t>(20);
 const size_t NPartiIni=(restart)?ReadFromInput<size_t>(1,".restart.conf"):ReadFromInput<size_t>(1);
 ofstream  lattice::thesweep("sweep",(restart)?std::ofstream::out | std::ofstream::app:std::ofstream::out),lattice::theratios("ratios",(restart)?std::ofstream::out | std::ofstream::app:std::ofstream::out);
-
+size_t Warmup=ReadFromInput<int>(21);
 bool isGrandCanonical=ReadFromInput<string>(11)=="GrandCanonical";
 
 const size_t lattice::NRep=ReadFromInput<size_t>(5);
@@ -149,8 +151,67 @@ void lattice::setup()const
 
 }
 
+void lattice::Warm() const
+{
+    ofstream RestartConf(".restartVAR.conf");
+    ofstream RestartPtrConf(".restartPtrVAR.conf");
+
+    for(size_t step=0;step<NRep;step++)
+    {
+
+        const auto myBlock=block(grid,NTimeSlices,NSweeps
+#ifdef USEROOT
+                                 ,nullptr
+#endif
+                                     );
+
+
+
+
+
+
+
+        system(("sed -i 's/^.*\\#mu\\b.*$/" + to_string(Site::mu)   + "              \\#mu/' input").c_str());
+        system(("sed -i 's/^.*\\#Warmup\\b.*$/" +to_string(0) +     "              \\#Warmup/' input").c_str());
+        system("sed -i 's/^.*\\Canonical\\b.*$/Canonical       \\# or Canonical/' input");
+
+
+
+
+        RestartConf<<grid->at(0).at(0).NParti_<<" #Particles"<<endl;
+        RestartConf.precision(12);
+
+
+        for(size_t i=0;i<NTimeSlices;i++)
+        {
+
+                for(size_t j = 0; j<grid->at(0).at(0).NParti_; j++)
+                {
+
+                    const auto var=grid->at(i).at(j);
+                    RestartConf<<var.pos;
+
+                    RestartPtrConf<<var.left->ParticleOnBead<<" "<<var.left->TimeSliceOnBead<<" "<<var.right->ParticleOnBead<<" "<<var.right->TimeSliceOnBead<<" ";
+                }
+        }
+
+
+if(!Warmup)
+{
+
+    break;
+}
+
+    }
+
+
+
+
+}
+
 void lattice::move()const
 {
+
 
 
 if(!restart)thesweep<< left << setw(12) <<"KEnergy"<< left << setw(12) <<"PEnergy"<< left << setw(12) <<"TEnergy"<< left << setw(12) <<"WormLenght"<< left << setw(12) <<"SuperFlDens"<< right << setw(12) <<"NParti"<</* right << setw(12) <<"S(k,w=0)"<<*/endl;
@@ -252,6 +313,7 @@ void lattice::PrintConfiguration (
    step++;
 #endif
 #ifdef USEROOT
+
     (*v)[0] = step;
 
 
@@ -262,6 +324,7 @@ void lattice::PrintConfiguration (
         hpos->Reset("ICESM");
 
    gDirectory->Write("", TObject::kOverwrite);
+
 #endif
 
 
@@ -270,11 +333,14 @@ Constants::saveRandom();
    RestartPtrConf.close();
    rename(".restartVAR.conf", ".restart.conf");
    rename(".restartPtrVAR.conf", ".restartPtr.conf");
-   ofstream muAndeta(".muAndeta");
-   muAndeta<<fixed<<Site::mu<<endl;
-   muAndeta<<fixed<<Site::eta<<endl;
-    muAndeta.close();
 
+
+
+
+
+
+
+   
 
 }
 
