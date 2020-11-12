@@ -10,7 +10,7 @@
 
 using namespace std;
 
-void printinput(void);
+
 int main()
 {
 auto start = chrono::high_resolution_clock::now();
