@@ -196,6 +196,8 @@ void lattice::Warm() const
 
         RestartConf.close();
         RestartPtrConf.close();
+        rename(".restartVAR.conf", ".restart.conf");
+        rename(".restartPtrVAR.conf", ".restartPtr.conf");
 if(!Warmup)
 {
     system(("sed -i 's/^.*\\#Warmup\\b.*$/" +to_string(0) +     "              \\#Warmup/' input").c_str());
