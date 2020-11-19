@@ -68,7 +68,7 @@ bool Site::OpenWorm(const size_t step, const size_t ab, double dU, const positio
         right->ChangeInU(true,dU,U);
 
         if(right->OpenWorm(step-1,ab,dU,start))
-        {            
+        {
             Lbead=this;
             right->active=false;
             const auto Dist=pos-right->pos;
