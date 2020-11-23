@@ -54,7 +54,7 @@ while(step<NSweeps)
         if(start->NParti_==War)
         {
             CorrectNpart++;
-            if(CorrectNpart>10)
+            if(CorrectNpart>100)
             {
                 War=0;
                 isGrandCanonical=0;
