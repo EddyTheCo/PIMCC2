@@ -132,6 +132,8 @@ gROOT->SetBatch(kTRUE);
 
     XYProj(hist,"Last");
     XZProj(hist,"Last");
+
+    cout<<"Last NEntries="<<hist->GetEntries()<<endl;
     Ave->GetXaxis()->SetTitle("X");
     Ave->GetYaxis()->SetTitle("Y");
     Ave ->GetZaxis()->SetTitle("Z");
@@ -139,10 +141,11 @@ gROOT->SetBatch(kTRUE);
     Ave->GetZaxis()->CenterTitle(true);
     Ave->GetXaxis()->CenterTitle(true);
     Ave->Draw();
+    cout<<"Full NEntries="<<Ave->GetEntries()<<endl;
     c1->Print("Average.png");
 
-    XYProj(hist,"Average");
-    XZProj(hist,"Average");
+    XYProj(Ave,"Average");
+    XZProj(Ave,"Average");
     Ave->Scale(1.0/stp);
     Ave->Write("Average",TObject::kOverwrite);
     gDirectory->Write("", TObject::kOverwrite);
