@@ -84,10 +84,11 @@ gROOT->SetBatch(kTRUE);
 
 
     v = (TVectorD*)gDirectory->Get("v");
+    cout<<"v="<<(*v)[0]<<endl;
     TH1* hist = nullptr;
     bool var=1;
 
-    TCanvas*c1 = new TCanvas("c1", "c1", 1200,1000);
+    TCanvas* c1 = new TCanvas("c1", "c1", 1200,1000);
     gStyle->SetOptStat(0);
 
 
@@ -133,6 +134,7 @@ gROOT->SetBatch(kTRUE);
     XYProj(hist,"Last");
     XZProj(hist,"Last");
 
+    TCanvas* c2 = new TCanvas("c2", "c2", 1200,1000);
     cout<<"Last NEntries="<<hist->GetEntries()<<endl;
     Ave->GetXaxis()->SetTitle("X");
     Ave->GetYaxis()->SetTitle("Y");
@@ -142,7 +144,8 @@ gROOT->SetBatch(kTRUE);
     Ave->GetXaxis()->CenterTitle(true);
     Ave->Draw();
     cout<<"Full NEntries="<<Ave->GetEntries()<<endl;
-    c1->Print("Average.png");
+
+    c2->Print("Average.png");
 
     XYProj(Ave,"Average");
     XZProj(Ave,"Average");
