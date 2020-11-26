@@ -61,7 +61,8 @@ set(SCRIPTS
 #  INIMaterial
 #  INISource
   input
-  rootScript.cpp
+  RootScripts/Average.cpp
+  RootScripts/rootScript.cpp
  )
 
 foreach(_script ${SCRIPTS})
