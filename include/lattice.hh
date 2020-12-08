@@ -79,7 +79,7 @@ inline double getRemoveRatio(void)const
     static TFile *RootFile;
     static TH1* hpos;
     static TH2D *Greens;
-
+    static TH1D *PCFUp;
 static TVectorD * v;
 #endif
 

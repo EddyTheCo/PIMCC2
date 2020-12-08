@@ -22,6 +22,7 @@ const bool restart=ReadFromInput<string>(10)=="restart";
 TFile *lattice::RootFile = (restart)?new TFile("RootFile.root","UPDATE"):new TFile("RootFile.root","RECREATE");
 TH1* lattice::hpos = nullptr;
 TH2D* lattice::Greens = nullptr;
+TH1D* lattice::PCFUp = nullptr;
 #endif
 
 using namespace std;
@@ -86,9 +87,11 @@ TVectorD *lattice::v=nullptr;
     if(restart)
     {
         Greens = (TH2D*)gDirectory->Get("Greens");
+        PCFUp = (TH1D*)gDirectory->Get("PCFUp");
 
 
         if(!Greens)Greens=new TH2D("Greens","",5000,0,sqrt((position::L).norm()),NTimeSlices,-0.5,NTimeSlices-0.5);
+        if(!PCFUp)PCFUp=new TH1D("PCFUp","",5000,0,sqrt((position::L).norm()-(position::L).TheZ()*(position::L).TheZ()));
         v = (TVectorD*)gDirectory->Get("v");
         if(!v)
         {
@@ -101,6 +104,7 @@ TVectorD *lattice::v=nullptr;
     else
     {
         Greens=new TH2D("Greens","",5000,0,sqrt((position::L).norm()),NTimeSlices,-0.5,NTimeSlices-0.5);
+        PCFUp=new TH1D("PCFUp","",5000,0,sqrt((position::L).norm()-(position::L).TheZ()*(position::L).TheZ()));
 
         TVectorD v(1);
         v[0]=0.;
@@ -294,6 +298,7 @@ void lattice::PrintConfiguration (
 #ifdef SAVECONF
                if(!(step%SAMPLING)&&step!=0)Data<<var.pos;
 #endif
+
                RestartPtrConf<<var.left->ParticleOnBead<<" "<<var.left->TimeSliceOnBead<<" "<<var.right->ParticleOnBead<<" "<<var.right->TimeSliceOnBead<<" ";
 #ifdef USEROOT
 
@@ -303,6 +308,15 @@ void lattice::PrintConfiguration (
                 ((TH2D*)hpos)->Fill(grid->at(i).at(j).pos.perio(0),grid->at(i).at(j).pos.perio(1));
                 if(d==1)
                 ((TH1D*)hpos)->Fill(grid->at(i).at(j).pos.perio(0));
+
+                for(size_t k = 0; k<grid->at(0).at(0).NParti_; k++)
+                {
+                    if(j!=k)
+                    {
+                        const double dis=sqrt((grid->at(i).at(j).pos-grid->at(i).at(k).pos).norm());
+                        PCFUp->Fill(dis);
+                    }
+                }
 
 
 #endif
