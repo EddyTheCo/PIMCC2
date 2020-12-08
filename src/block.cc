@@ -131,7 +131,7 @@ while(step<NSweeps)
                 TSumOfdisplacement+=start->TEnergy;
                 TSumOfPotential+=start->TPotential;
                 TNumberOfParticles+=start->NParti_;
-                TWinding+=start->TWinding.normxy();
+                (d>2)?TWinding+=start->TWinding.normxy():TWinding+=start->TWinding.norm();
                 measureCounter++;
              }
 
