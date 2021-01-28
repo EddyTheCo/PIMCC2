@@ -18,6 +18,12 @@ include_directories(${ROOT_INSTALL}/include)
 endif()
 
 
+if(WARMUP)
+    message( STATUS "This build is using WARMUP")
+add_definitions(-DWARMUP)
+endif()
+
+
 if(SAVECONF)
     message( STATUS "This build will Save CONF ")
 add_definitions(-DSAVECONF)
@@ -63,6 +69,7 @@ set(SCRIPTS
   input
   RootScripts/Average.cpp
   RootScripts/rootScript.cpp
+  RootScripts/PCF.cpp
  )
 
 foreach(_script ${SCRIPTS})

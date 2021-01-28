@@ -156,7 +156,7 @@ inline size_t  CalculateNoWormLenght(void)const
      bool OpenWorm(const size_t, const size_t, double dU, const position & start);
      bool CloseWorm(double dU);
      bool Wiggle(double dU);
-     bool shiftParticle(double dU, const position& shift, const Site * const &str)const;
+     bool shiftParticle(double dU, const position& shift)const;
      void PrepareSwap(void)const;
      bool swap(Site * const , const double& SumI, const double& SumZ, double dU, const bool &isRight);
 
@@ -340,7 +340,7 @@ inline void ChangeInU(const bool & isRemove, double& dU ,double & U )const
     position pos,oldpos;
     Site* left,* right,* up,* down;
     const static potential ThePotential;
-    static size_t NParti_,NClose,NOpen,NMove,NSwap,NInsert,NInsertP,NRemo,NRemoP,NCloseP,NOpenP,NMoveP,NSwapP;
+    static size_t NParti_,NClose,NOpen,NWiggle,NShift,NShiftP,NWiggleP,NMove,NSwap,NInsert,NInsertP,NRemo,NRemoP,NCloseP,NOpenP,NMoveP,NSwapP;
 
 
  inline void restartRatios(void)const{

@@ -137,9 +137,6 @@ gROOT->SetBatch(kTRUE);
     {
 	    XZProj(Ave,"Average");
     }
-    Ave->Scale(1.0/stp);
-    Ave->Write("Average",TObject::kOverwrite);
-    gDirectory->Write("", TObject::kOverwrite);
 
 
 

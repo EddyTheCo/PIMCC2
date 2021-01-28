@@ -154,7 +154,7 @@ void lattice::setup()const
     }
 
 }
-
+#ifdef WARMUP
 void lattice::Warm() const
 {
 
@@ -216,7 +216,7 @@ if(!Warmup)
 
 
 }
-
+#endif
 void lattice::move()const
 {
 
@@ -224,7 +224,7 @@ void lattice::move()const
 
 if(!restart)thesweep<< left << setw(12) <<"KEnergy"<< left << setw(12) <<"PEnergy"<< left << setw(12) <<"TEnergy"<< left << setw(12) <<"WormLenght"<< left << setw(12) <<"SuperFlDens"<< right << setw(12) <<"NParti"<</* right << setw(12) <<"S(k,w=0)"<<*/endl;
 
-theratios<< left << setw(12)<<"Ropen"<<left << setw(12)<<"RClose"<<left << setw(12)<<"Rmove"<<left << setw(12)<<"Rswap"<<left << setw(12)<<"RInsert"<<left << setw(12)<<"RRmove"<<endl;
+theratios<< left << setw(12)<<"Ropen"<<left << setw(12)<<"RClose"<<left << setw(12)<<"Rmove"<<left << setw(12)<<"Rswap"<<left << setw(12)<<"RInsert"<<left << setw(12)<<"RWiggle"<<left << setw(12)<<"RShift"<<left << setw(12)<<"RRmove"<<endl;
     for(size_t step=0;step<NRep;step++)
     {
 
@@ -248,7 +248,7 @@ thesweep << left << setw(12) << myBlock.getKineticEnergy()<<" "<< left << setw(1
 
 
        theratios<< left << setw(12) <<getOpenRatio()<< left << setw(12) <<getCloseRatio()<< left << setw(12) <<getMoveRatio()<< left << setw(12)
-                <<getSwapRatio()<< left << setw(12) <<getInsertRatio()<< left << setw(12) <<getRemoveRatio()<<endl;
+                <<getSwapRatio()<< left << setw(12) <<getInsertRatio()<< left << setw(12) <<getWiggleRatio()<< left << setw(12) <<getShiftRatio()<< left << setw(12) <<getRemoveRatio()<<endl;
 
 
 

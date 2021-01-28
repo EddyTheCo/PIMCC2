@@ -28,10 +28,11 @@ size_t TWormlenght=0,step=0,measureCounter=0,measureCounter1=0;
 double TWinding=0;
 Site* const start=&(particles->at(0).at(0));
 
-
+#ifdef WARMUP
 size_t h=0;
 size_t War=Warmup;
 static size_t CorrectNpart=0;
+#endif
 while(step<NSweeps)
 {
 
@@ -40,7 +41,7 @@ while(step<NSweeps)
 //start->printLattice();
 //cout<<" Nparti="<<start->NParti_<<" Npartini="<<NPartiIni<<endl;
 
-
+#ifdef WARMUP
     if(!(h%1000)&&War&&isGrandCanonical)
     {
         if(start->NParti_<War)
@@ -58,7 +59,6 @@ while(step<NSweeps)
             {
                 War=0;
                 isGrandCanonical=0;
-
             }
         }
 
@@ -68,11 +68,12 @@ while(step<NSweeps)
     }
     h++;
 
-
+#endif
          if(start->ThereIsAWorm)
         {
-
+#ifdef WARMUP
                 if(!Warmup)
+#endif
                 {
                     measureCounter1++;
                 TWormlenght+=start->NInactiveLinks();
@@ -136,7 +137,7 @@ while(step<NSweeps)
              }
 
 
-             switch ((isGrandCanonical)?giveRanI(2):giveRanI(1)) {
+             switch ((isGrandCanonical)?giveRanI(3):giveRanI(2)) {
              case 0:
              {
 
@@ -157,7 +158,7 @@ while(step<NSweeps)
             {
                  if(start->NParti_)
                  {
-
+                    start->NWiggleP++;
                    //cout<<"wiggle"<<endl;
 
                      const size_t posiTimes=giveRanI(NTimeSlices-1) ; //Choose a random time slice
@@ -177,12 +178,43 @@ while(step<NSweeps)
                 }
                 break;
             }
-              case 2:
+              case 3:
              {
                  //cout<<"insertworminclose "<<Constants::giveRanD(1)<<" "<<Constants::giveRanDNormal(0,1)<<endl;
                  start->insertWorm();
                  break;
              }
+             case 2:
+            {
+                 start->NShiftP++;
+                 if(start->NParti_)
+                 {
+
+//                 cout<<"ShiftParticle"<<endl;
+
+
+                     const size_t posiParti=giveRanI(start->NParti_-1); //Choose the particle
+
+                        start->Lbead=&(particles->at(0).at(posiParti)); //LBEAD is proposed (but dosent mean theres is a worm)
+
+
+                        vector<double> varVec;
+
+                        varVec.push_back(-position::L.TheX()/2.0+giveRanD(position::L.TheX()));
+                        if(d>1)varVec.push_back(-position::L.TheY()/2.0+giveRanD(position::L.TheY()));
+                        if(d>2)varVec.push_back(-position::L.TheZ()/2.0+giveRanD(position::L.TheZ()));
+                        const position p=position(varVec);
+
+
+                        start->Lbead->shiftParticle(0,p);
+
+                        start->Lbead=nullptr;
+
+
+                }
+                break;
+            }
+
              }
 
 
@@ -190,8 +222,9 @@ while(step<NSweeps)
 
     }
 
-
+#ifdef WARMUP
 if(!Warmup)
+#endif
 {
         SumofDisplacement=TSumOfdisplacement/measureCounter;
         SumOfPotential=TSumOfPotential/measureCounter;
@@ -199,11 +232,12 @@ if(!Warmup)
         Wormlenght=1.*TWormlenght/measureCounter1;
         SumofWinding=TWinding/measureCounter;
 }
+#ifdef WARMUP
 if(!War&&Warmup)
 {
     Warmup=0;
 }
-
+#endif
 }
 
 

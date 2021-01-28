@@ -42,7 +42,7 @@ Site* Site::Lbead=nullptr;
 Site* Site::Rbead=nullptr;
 position Site::TWinding=position(0.);
 position Site::TWindingVar=position(0.);
-size_t Site::NClose=1,Site::NOpen=1,Site::NMove=1,Site::NSwap=1,Site::NCloseP=1,Site::NOpenP=1,Site::NMoveP=1,Site::NSwapP=1,Site::NInsertP=1,Site::NInsert=1,Site::NRemoP=1,Site::NRemo=1;
+size_t Site::NClose=1,Site::NOpen=1,Site::NMove=1,Site::NWiggle=1,Site::NWiggleP=1,Site::NShift=1,Site::NShiftP=1,Site::NSwap=1,Site::NCloseP=1,Site::NOpenP=1,Site::NMoveP=1,Site::NSwapP=1,Site::NInsertP=1,Site::NInsert=1,Site::NRemoP=1,Site::NRemo=1;
 Site::Site():pos(position(1.0))
 {
 
@@ -183,6 +183,7 @@ right->oldpos=right->pos;
 
         if(exp(dU)>giveRanD(1.))
         {
+            NWiggle++;
             TPotential-=TPotentialVar;
             const auto Dist=right->pos-pos;
             TEnergy+=TEnergyVar+Dist.norm();
@@ -869,22 +870,26 @@ else {
 }
 
 
-bool Site::shiftParticle(double dU, const position& shift, const Site * const &str)const
+bool Site::shiftParticle(double dU, const position& shift)const
 {
     right->oldpos=right->pos;
+
     double U=0;
-    right->ChangeInU(false,dU,U);
+    right->ChangeInU(true,dU,U);
     TPotentialVar+=U;
-    right->pos=right->pos-(shift*-1);  //the minus sign is in order to propose new position using Pbc
 
+    //cout<<"right="<<right->ParticleOnBead<<" "<<right->TimeSliceOnBead<<" "<<right->pos<<endl;
+    right->pos=right->pos+shift;
+    //cout<<"right="<<right->ParticleOnBead<<" "<<right->TimeSliceOnBead<<" "<<right->pos<<endl;
     right->ChangeInU(false,dU,U);
 
-        if(this!=str->left)
+        if(this!=Lbead->left)
         {
 
-            if(right->shiftParticle(dU,shift,str))
+            if(right->shiftParticle(dU,shift))
             {
                 TPotential+=U;
+                //cout<<oldpos-right->oldpos<<" "<<pos-right->pos<<endl;
                 return true;
             }
             right->pos=right->oldpos;
@@ -896,9 +901,11 @@ bool Site::shiftParticle(double dU, const position& shift, const Site * const &s
 
             if(exp(dU)>giveRanD(1.))
             {
+                NShift++;
                 TPotential+=U;
                 TPotential-=TPotentialVar;
                 TPotentialVar=0.;
+                //cout<<oldpos-right->oldpos<<" "<<pos-right->pos<<endl;
                return true;
             }
             right->pos=right->oldpos;

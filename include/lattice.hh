@@ -32,8 +32,9 @@ public:
 
     void setup()const;
     void move()const;
+#ifdef WARMUP
     void Warm() const;
-
+#endif
      void PrintConfiguration (
         #ifdef USEROOT
         const size_t step
@@ -63,6 +64,14 @@ inline double getSwapRatio(void)const
 inline double getInsertRatio(void)const
 {
     return grid->at(0).at(0).NInsert*1./grid->at(0).at(0).NInsertP;
+}
+inline double getWiggleRatio(void)const
+{
+    return grid->at(0).at(0).NWiggle*1./grid->at(0).at(0).NWiggleP;
+}
+inline double getShiftRatio(void)const
+{
+    return grid->at(0).at(0).NShift*1./grid->at(0).at(0).NShiftP;
 }
 inline double getRemoveRatio(void)const
 {

@@ -96,7 +96,7 @@ return;
 inline void potential::LiebLini(double & dU,position& graddU,const Site* const bead,const Site* const ptr)const
 {
 
-    if(sqrt((bead->pos-ptr->pos).norm())<1.)
+    if(sqrt((bead->pos-ptr->pos).norm())<=1.)
     {
         dU+= CLieb;
     }
