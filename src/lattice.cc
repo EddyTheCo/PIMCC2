@@ -58,7 +58,44 @@ lattice::lattice()
 
             for(size_t j = 0; j<NPartiIni; j++)
             {
-                 grid->at(i).push_back(Site(j,i));
+                if(restart)
+                {
+                    double var;
+                    vector<double> x;
+                    for(size_t k=0;k<d;k++)
+                    {
+                        (* position::inFile)>>var;
+                        x.push_back(var);
+
+                    }
+
+
+
+
+
+                     grid->at(i).push_back(Site(j,i,position(x),true));
+                }
+                else
+                {
+
+
+                    if(i==0)
+                    {
+                        vector<double> x;
+                        for(size_t k=0;k<d;k++)
+                        {
+                            x.push_back(Constants::giveRanD(position::L.x.at(k))-position::L.x.at(k)/2);
+                        }
+                        grid->at(i).push_back(Site(j,i,position(x),true));
+                    }
+                    else
+                    {
+                        grid->at(i).push_back(Site(j,i,grid->at(0).at(j).pos,true));
+                    }
+
+
+
+                }
 
             }
 
@@ -162,7 +199,7 @@ void lattice::Warm() const
     for(size_t step=0;step<NRep;step++)
     {
 
-        const auto myBlock=block(grid,NTimeSlices,NSweeps
+        const auto myBlock=block(NSweeps
 #ifdef USEROOT
                                  ,nullptr
 #endif
@@ -228,7 +265,7 @@ theratios<< left << setw(12)<<"Ropen"<<left << setw(12)<<"RClose"<<left << setw(
     for(size_t step=0;step<NRep;step++)
     {
 
-        const auto myBlock=block(grid,NTimeSlices,NSweeps
+        const auto myBlock=block(NSweeps
 #ifdef USEROOT
                                  ,Greens
 #endif
@@ -283,14 +320,14 @@ void lattice::PrintConfiguration (
        var=0;
    }
 #endif
-   RestartConf<<grid->at(0).at(0).NParti_<<" #Particles"<<endl;
+   RestartConf<<Site::getNparti()<<" #Particles"<<endl;
    RestartConf.precision(12);
 
 
    for(size_t i=0;i<NTimeSlices;i++)
    {
 
-           for(size_t j = 0; j<grid->at(0).at(0).NParti_; j++)
+           for(size_t j = 0; j<Site::getNparti(); j++)
            {
 
                const auto var=grid->at(i).at(j);

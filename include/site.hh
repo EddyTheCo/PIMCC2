@@ -19,12 +19,15 @@ extern const bool restart;
 class Site
 {
 	public:
-    Site();
-    ~Site(){}
-    Site(const size_t i,const size_t j);
-    Site(const size_t i,const size_t j,const string var);
+
+    ~Site();
+    Site(const size_t i,const size_t j,const position var,const bool act );
     static Site* Lbead;
     static Site* Rbead;
+    static inline size_t getNparti(void)
+    {
+        return NpartixNT/NTimeSlices;
+    }
     friend ostream & operator << (ostream &out, const Site & obj)
     {
                 if(obj.active)
@@ -46,6 +49,7 @@ class Site
         right=std::move(v.right);
         up=std::move(v.up);
         down=std::move(v.down);
+        NpartixNT++;
         return *this;
       }
     Site(const Site& v){
@@ -58,14 +62,16 @@ class Site
         right=v.right;
         up=v.up;
         down=v.down;
+        NpartixNT++;
     }
     Site& operator=(const Site& v)
     {
         auto tmp = v;
         (*this) = std::move(tmp);
+        NpartixNT++;
         return *this;
     }
- inline size_t  CalculateWormLenght(void)const
+ inline static  size_t  CalculateWormLenght(void)
  {
      size_t wormL=0;
 
@@ -78,7 +84,7 @@ class Site
      return wormL;
 
  }
- inline bool cantClose(size_t del)const
+ inline static bool cantClose(size_t del)
  {
 const Site*  ptr=Lbead->right;
 while(del>1)
@@ -91,7 +97,7 @@ while(del>1)
 return true;
  }
 
- inline bool NfindHead(size_t del,const bool &isRight)const
+ inline static bool NfindHead(size_t del,const bool &isRight)
  {
     if(isRight)
     {
@@ -141,7 +147,7 @@ return true;
      }
      return wormL;
  }
-inline size_t  CalculateNoWormLenght(void)const
+inline static size_t  CalculateNoWormLenght(void)
  {
      size_t wormL=0;
 
@@ -157,7 +163,63 @@ inline size_t  CalculateNoWormLenght(void)const
      bool CloseWorm(double dU);
      bool Wiggle(double dU);
      bool shiftParticle(double dU, const position& shift)const;
-     void PrepareSwap(void)const;
+     static void  PrepareSwap(void)
+     {
+
+         const auto oldRbead=Rbead;
+         double SumI=0,SumZ=0;
+         const auto oldLbead=Lbead;
+
+
+             const auto vae=giveRanI(MBar-2);
+             Site* alpha, *zeta;
+             if ( giveRanI(1) )
+             {
+                 const auto NewRbead=oldLbead->searchBeadForced(true,vae);
+                 alpha=NewRbead->chooseTheBead(SumI,vae+1,oldLbead);
+
+                 if(alpha==nullptr)return;
+
+                 zeta=alpha->searchBead(false,vae);
+                 if (zeta==nullptr||zeta==Rbead||zeta==Lbead)return;
+
+
+                     NewRbead->chooseTheBead(SumZ,vae+1,zeta);
+                     Rbead=alpha;
+                     if(Lbead->swap(zeta,SumI,SumZ,0,true))
+                     {
+                         Lbead=zeta;
+                     }
+                     Rbead=oldRbead;
+
+              }
+             else
+             {
+                 const auto NewLbead=oldRbead->searchBeadForced(false,vae);
+                 if(NewLbead==nullptr)return;
+
+
+                 alpha=NewLbead->chooseTheBead(SumI,vae+1,oldRbead);
+
+                 if(alpha==nullptr)return;
+
+
+                 zeta=alpha->searchBead(true,vae);
+                 if (zeta==nullptr||zeta==Rbead||zeta==Lbead)return;
+
+                 NewLbead->chooseTheBead(SumZ,vae+1,zeta);
+                 Lbead=alpha;
+                 if(Rbead->swap(zeta,SumI,SumZ,0,false))
+                 {
+                      Rbead=zeta;
+                 }
+
+                         Lbead=oldLbead;
+
+             }
+
+
+     }
      bool swap(Site * const , const double& SumI, const double& SumZ, double dU, const bool &isRight);
 
 
@@ -176,8 +238,107 @@ inline size_t  CalculateNoWormLenght(void)const
 
      }
      bool insertToRight(const size_t step, double dU);
-     void insertWorm(void);
-     void removeWorm(void);
+     void static insertWorm(void)
+     {
+
+     insertParticle();
+
+         const size_t posiTimes=giveRanI(NTimeSlices-1) ;
+
+         Rbead=&(theParticles->at(posiTimes).back());
+         Lbead=Rbead;
+             const auto var2=giveRanI(MBar-2);
+
+             Rbead->pos=position("random");
+
+             Rbead->active=true;
+         NInsertP++;
+
+
+         double U=0,dU=0;
+         Rbead->ChangeInU(false,dU,U);
+             if(Rbead->insertToLeft(var2,dU+log(eta)))
+             {
+                 NInsert++;
+
+                 TPotential+=U;
+                 ThereIsAWorm= true;
+             }
+             else
+             {
+                 removeLastParticle();
+
+             }
+     }
+     static void removeWorm(void)
+     {
+         NRemoP++;
+         const auto wormLenght=CalculateWormLenght();
+         if(wormLenght>=MBar)
+             return;
+
+
+         if(Rbead->deleteToRight(wormLenght,-log(eta)))
+         {
+             NRemo++;
+             Site* ptr=Rbead;
+             const Site* markPtr;
+             size_t step=0;
+             do
+             {
+                 markPtr=ptr->right;
+                  Site* newPtr=ptr->left;
+                 const auto timesl=ptr->TimeSliceOnBead;
+                 const auto topParticle=&(theParticles->at(timesl).back());
+                 if(newPtr==topParticle)newPtr=topParticle->left;
+                     topParticle->up->down=topParticle->down;
+                     topParticle->down->up=topParticle->up;
+
+                     if(topParticle!=ptr&&topParticle->active)
+                     {
+                         ptr->active=true;
+                         if(Rbead==topParticle)Rbead=ptr;
+                         if(Lbead==topParticle)Lbead=ptr;
+                         topParticle->left->right=ptr;
+                         topParticle->right->left=ptr;
+                         Site* const oldPtrLeft=ptr->left;
+                         Site* const oldPtrRight=ptr->right;
+                         ptr->left=topParticle->left;
+                         ptr->right=topParticle->right;
+                         ptr->pos=topParticle->pos;
+                         ptr->oldpos=topParticle->oldpos;
+                         topParticle->left=oldPtrLeft;
+                         topParticle->right=oldPtrRight;
+
+
+
+                     }
+                             if(!topParticle->right->active)
+                             {
+                                 topParticle->right->left=topParticle->left;
+                                 topParticle->left->right=topParticle->right;
+
+                             }
+
+                 step++;
+
+                 theParticles->at(timesl).pop_back();
+                 if(ptr==markPtr)break;
+
+                 ptr=newPtr;
+
+
+             }while(1);
+
+             Lbead=nullptr;
+             Rbead=nullptr;
+             ThereIsAWorm=false;
+
+
+         }
+
+
+     }
      bool insertToLeft(const size_t step, double dU);
 
 
@@ -212,16 +373,7 @@ inline size_t  CalculateNoWormLenght(void)const
             left=&(theParticles->at(LeftTi).at(LeftPa));
             right=&(theParticles->at(RightTi).at(RightPa));
 
-            double var;
-            vector<double> x;
-            for(size_t i=0;i<d;i++)
-            {
-                (* position::inFile)>>var;
-                x.push_back(var);
 
-            }
-            pos=position(x);
-            oldpos=pos;
 
 
         }
@@ -230,30 +382,10 @@ inline size_t  CalculateNoWormLenght(void)const
             left=&(theParticles->at((TimeSliceOnBead-1+NTimeSlices)%NTimeSlices).at(ParticleOnBead));
             right=&(theParticles->at((TimeSliceOnBead+1)%NTimeSlices).at(ParticleOnBead));
 
-
-            double var;
-            vector<double> x;
-            for(size_t i=0;i<d;i++)
-            {
-                if(TimeSliceOnBead==0)
-                {
-
-                         x.push_back(Constants::giveRanD(position::L.x.at(i))-position::L.x.at(i)/2);
-
-
-                }
-                else
-                {
-                    x.push_back(left->pos.x.at(i));
-                }
-
-         }
-            pos=position(x);
-            oldpos=pos;
         }
 
-        up=&(theParticles->at(TimeSliceOnBead).at((ParticleOnBead+1)%NParti_));
-        down=&(theParticles->at(TimeSliceOnBead).at((ParticleOnBead-1+NParti_)%NParti_));
+        up=&(theParticles->at(TimeSliceOnBead).at((ParticleOnBead+1)%getNparti()));
+        down=&(theParticles->at(TimeSliceOnBead).at((ParticleOnBead-1+getNparti())%getNparti()));
 
 
     }
@@ -272,7 +404,7 @@ inline size_t  CalculateNoWormLenght(void)const
 
     }
 
-    inline void MoveWorm(void)const
+    inline static void MoveWorm(void)
     {        
         const auto del=giveRanI(MBar-1);
         switch ( giveRanI(4) ) {
@@ -340,7 +472,7 @@ inline void ChangeInU(const bool & isRemove, double& dU ,double & U )const
     position pos,oldpos;
     Site* left,* right,* up,* down;
     const static potential ThePotential;
-    static size_t NParti_,NClose,NOpen,NWiggle,NShift,NShiftP,NWiggleP,NMove,NSwap,NInsert,NInsertP,NRemo,NRemoP,NCloseP,NOpenP,NMoveP,NSwapP;
+    static size_t NpartixNT,NClose,NOpen,NWiggle,NShift,NShiftP,NWiggleP,NMove,NSwap,NInsert,NInsertP,NRemo,NRemoP,NCloseP,NOpenP,NMoveP,NSwapP;
 
 
  inline void restartRatios(void)const{
@@ -355,7 +487,7 @@ inline void ChangeInU(const bool & isRemove, double& dU ,double & U )const
     {
         return 1/(4*landa*tao*N);
     }
-    inline size_t NInactiveLinks(void) const{
+    inline static size_t NInactiveLinks(void){
         if(Rbead!=nullptr&&Lbead!=nullptr)
         {
             const int dis=Rbead->TimeSliceOnBead-Lbead->TimeSliceOnBead;
@@ -386,8 +518,42 @@ inline void ChangeInU(const bool & isRemove, double& dU ,double & U )const
             cout<<"#errorSite.hh"<<Rbead->TimeSliceOnBead<<" "<<Lbead->TimeSliceOnBead<<endl;
 
     ;}
-    void insertParticle(void)const;
-    inline void removeLastParticle(void)const
+    void static insertParticle(void)
+    {
+
+        vector<double> x;
+        for(size_t k=0;k<d;k++)
+        {
+            x.push_back(Constants::giveRanD(position::L.x.at(k))-position::L.x.at(k)/2);
+        }
+        for(size_t i=0;i<NTimeSlices;i++)
+        {
+
+            theParticles->at(i).push_back(Site(getNparti(),i,position(x),false));
+
+
+            theParticles->at(i).back().up=&(theParticles->at(i).front());
+
+            if(theParticles->at(i).size()>1)
+                theParticles->at(i).back().down=&(theParticles->at(i).back())-1;
+            else {
+                theParticles->at(i).back().down=&(theParticles->at(i).back());
+            }
+            theParticles->at(i).back().down->up=&(theParticles->at(i).back());
+            theParticles->at(i).back().up->down=&(theParticles->at(i).back());
+
+            if(i)
+            {
+                theParticles->at(i).back().left=&(theParticles->at(i-1).back());
+                theParticles->at(i).back().left->right=&(theParticles->at(i).back());
+            }
+
+        }
+
+        theParticles->at(NTimeSlices-1).back().right=&(theParticles->at(0).back());
+        theParticles->at(0).back().left=&(theParticles->at(NTimeSlices-1).back());
+    }
+    inline static void removeLastParticle(void)
     {
         size_t step=0;
         Site* ptr;
@@ -439,13 +605,13 @@ inline void ChangeInU(const bool & isRemove, double& dU ,double & U )const
     void printLattice(void)const
     {
         cout<<"###"<<TEnergy<<" cara"<<TPotential<<endl;
-        cout<<"NParticles="<<NParti_<<endl;
-        Site var;
-        for(size_t j=0;j<NParti_;j++)
+        cout<<"NParticles="<<getNparti()<<endl;
+
+        for(size_t j=0;j<getNparti();j++)
          {
              for (size_t i=0;i<NTimeSlices;i++)
              {
-                 var=theParticles->at(i).at(j);
+                 const Site var=theParticles->at(i).at(j);
                  if(var.active)
                      cout<<var.pos;
                  else {
@@ -462,7 +628,7 @@ inline void ChangeInU(const bool & isRemove, double& dU ,double & U )const
 
     bool active;
     static Site* theZeta;
-	private:
+
 
     static array<vector<Site>,10000>* theParticles;
 

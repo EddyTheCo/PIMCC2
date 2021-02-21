@@ -14,7 +14,7 @@ using namespace std;
 
 
 
-block::block(array<vector<Site>,10000>* particles, const size_t &NTimeSlices, const size_t &NSweeps
+block::block(const size_t &NSweeps
              #ifdef USEROOT
              , TH2D * const Greens
              #endif
@@ -26,7 +26,7 @@ block::block(array<vector<Site>,10000>* particles, const size_t &NTimeSlices, co
 double TSumOfdisplacement=0,TSumOfPotential=0,TNumberOfParticles=0;
 size_t TWormlenght=0,step=0,measureCounter=0,measureCounter1=0;
 double TWinding=0;
-Site* const start=&(particles->at(0).at(0));
+
 
 #ifdef WARMUP
 size_t h=0;
@@ -38,13 +38,12 @@ while(step<NSweeps)
 
 
 
-//start->printLattice();
-//cout<<" Nparti="<<start->NParti_<<" Npartini="<<NPartiIni<<endl;
+
 
 #ifdef WARMUP
     if(!(h%1000)&&War&&isGrandCanonical)
     {
-        if(start->NParti_<War)
+        if(Site::getNparti()<War)
         {
             Site::mu+=1;
         }
@@ -69,26 +68,26 @@ while(step<NSweeps)
     h++;
 
 #endif
-         if(start->ThereIsAWorm)
+         if(Site::ThereIsAWorm)
         {
 #ifdef WARMUP
                 if(!Warmup)
 #endif
                 {
                     measureCounter1++;
-                TWormlenght+=start->NInactiveLinks();
+                TWormlenght+=Site::NInactiveLinks();
 #ifdef USEROOT
-                Greens->Fill(sqrt((start->Rbead->pos-start->Lbead->pos).norm()),abs(1.*start->Rbead->TimeSliceOnBead-1.*start->Lbead->TimeSliceOnBead));
+                Greens->Fill(sqrt((Site::Rbead->pos-Site::Lbead->pos).norm()),abs(1.*Site::Rbead->TimeSliceOnBead-1.*Site::Lbead->TimeSliceOnBead));
 #endif
                 }
             switch ((!isGrandCanonical)?giveRanI(2):giveRanI(3)) {
             case 0:
             {
                //cout<<"closing worm"<<endl;
-                    start->NCloseP++;
-                    if(!(start->cantClose(MBar)))
+                    Site::NCloseP++;
+                    if(!(Site::cantClose(MBar)))
                     {
-                    if(start->Lbead->CloseWorm(0))
+                    if(Site::Lbead->CloseWorm(0))
                     {
                         step++;
 
@@ -99,16 +98,16 @@ while(step<NSweeps)
             case 1:
             {
                //cout<<"MoveWorm"<<endl;
-                start->NMoveP++;
-                    start->MoveWorm();
+                Site::NMoveP++;
+                    Site::MoveWorm();
                      break;
             }
             case 2:
             {
                //cout<<"swap"<<endl;
-                start->NSwapP++;
-               if(start->NParti_>1)
-               start->PrepareSwap();
+                Site::NSwapP++;
+               if(Site::getNparti()>1)
+               Site::PrepareSwap();
 
                break;
             }
@@ -116,7 +115,7 @@ while(step<NSweeps)
             {
 
                 //cout<<"removeWorm"<<endl;
-                start->removeWorm();
+                Site::removeWorm();
                 break;
             }
 
@@ -129,91 +128,62 @@ while(step<NSweeps)
         {
              if(!Warmup)
              {
-                TSumOfdisplacement+=start->TEnergy;
-                TSumOfPotential+=start->TPotential;
-                TNumberOfParticles+=start->NParti_;
-                (d>2)?TWinding+=start->TWinding.normxy():TWinding+=start->TWinding.norm();
+                TSumOfdisplacement+=Site::TEnergy;
+                TSumOfPotential+=Site::TPotential;
+                TNumberOfParticles+=Site::getNparti();
+                (d>2)?TWinding+=Site::TWinding.normxy():TWinding+=Site::TWinding.norm();
                 measureCounter++;
              }
 
 
-             switch ((isGrandCanonical)?giveRanI(3):giveRanI(2)) {
+             switch ((isGrandCanonical)?giveRanI(2):giveRanI(1)) {
              case 0:
              {
 
-               if(start->NParti_)
+               if(Site::getNparti())
                {
                   // cout<<"OpenWorm"<<endl;
-                    start->NOpenP++;
+                    Site::NOpenP++;
                    const size_t posiTimes=giveRanI(NTimeSlices-1) ;
-                   const size_t posiParti=giveRanI(particles->at(posiTimes).size()-1);
+                   const size_t posiParti=giveRanI(Site::getNparti() -1);
                    const size_t var2=  giveRanI(MBar-2);
-                   Site* const Ranbead=&(particles->at(posiTimes).at(posiParti));
-                   start->ThereIsAWorm= Ranbead->OpenWorm(var2,var2+1,0,Ranbead->pos);
+                   Site* const Ranbead=&(Site::theParticles->at(posiTimes).at(posiParti));
+                   Site::ThereIsAWorm= Ranbead->OpenWorm(var2,var2+1,0,Ranbead->pos);
                }
 
                 break;
              }
              case 1:
             {
-                 if(start->NParti_)
+                 if(Site::getNparti())
                  {
-                    start->NWiggleP++;
+                    Site::NWiggleP++;
                    //cout<<"wiggle"<<endl;
 
                      const size_t posiTimes=giveRanI(NTimeSlices-1) ; //Choose a random time slice
-                     const size_t posiParti=giveRanI(particles->at(posiTimes).size()-1); //Choose the particle
+                     const size_t posiParti=giveRanI(Site::getNparti()-1); //Choose the particle
 
-                        start->Lbead=&(particles->at(posiTimes).at(posiParti)); //LBEAD is proposed (but dosent mean theres is a worm)
+                        Site::Lbead=&(Site::theParticles->at(posiTimes).at(posiParti)); //LBEAD is proposed (but dosent mean theres is a worm)
                         const size_t var2= giveRanI(MBar-3)+1;
 
-                        start->Rbead=start->Lbead->searchBead(true,var2);
-                        start->Lbead->oldpos=start->Lbead->pos;
+                        Site::Rbead=Site::Lbead->searchBead(true,var2);
+                        Site::Lbead->oldpos=Site::Lbead->pos;
 
-                        start->Lbead->Wiggle(0);
+                        Site::Lbead->Wiggle(0);
 
-                        start->Lbead=nullptr;
-                        start->Rbead=nullptr;
+                        Site::Lbead=nullptr;
+                        Site::Rbead=nullptr;
 
                 }
                 break;
             }
-              case 3:
+              case 2:
              {
                  //cout<<"insertworminclose "<<Constants::giveRanD(1)<<" "<<Constants::giveRanDNormal(0,1)<<endl;
-                 start->insertWorm();
+                 Site::insertWorm();
                  break;
              }
-             case 2:
-            {
-                 start->NShiftP++;
-                 if(start->NParti_)
-                 {
 
-//                 cout<<"ShiftParticle"<<endl;
-
-
-                     const size_t posiParti=giveRanI(start->NParti_-1); //Choose the particle
-
-                        start->Lbead=&(particles->at(0).at(posiParti)); //LBEAD is proposed (but dosent mean theres is a worm)
-
-
-                        vector<double> varVec;
-
-                        varVec.push_back(-position::L.TheX()/2.0+giveRanD(position::L.TheX()));
-                        if(d>1)varVec.push_back(-position::L.TheY()/2.0+giveRanD(position::L.TheY()));
-                        if(d>2)varVec.push_back(-position::L.TheZ()/2.0+giveRanD(position::L.TheZ()));
-                        const position p=position(varVec);
-
-
-                        start->Lbead->shiftParticle(0,p);
-
-                        start->Lbead=nullptr;
-
-
-                }
-                break;
-            }
 
              }
 
