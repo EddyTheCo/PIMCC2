@@ -218,14 +218,14 @@ void lattice::Warm() const
         ofstream RestartConf(".restartVAR.conf");
         ofstream RestartPtrConf(".restartPtrVAR.conf");
 
-        RestartConf<<grid->at(0).at(0).NParti_<<" #Particles"<<endl;
+        RestartConf<<Site::getNparti()<<" #Particles"<<endl;
         RestartConf.precision(12);
 
 
         for(size_t i=0;i<NTimeSlices;i++)
         {
 
-                for(size_t j = 0; j<grid->at(0).at(0).NParti_; j++)
+                for(size_t j = 0; j<Site::getNparti(); j++)
                 {
 
                     const auto var=grid->at(i).at(j);
@@ -316,7 +316,7 @@ void lattice::PrintConfiguration (
    static int var=1;
    if(var)
    {
-       Data<<"#Beta="<<beta<<" Nparticles="<<grid->at(0).at(0).NParti_<<" NtimesLices="<<NTimeSlices<<endl;
+       Data<<"#Beta="<<beta<<" Nparticles="<<Site::getNparti()<<" NtimesLices="<<NTimeSlices<<endl;
        var=0;
    }
 #endif
@@ -346,7 +346,7 @@ void lattice::PrintConfiguration (
                 if(d==1)
                 ((TH1D*)hpos)->Fill(grid->at(i).at(j).pos.perio(0));
 
-                for(size_t k = 0; k<grid->at(0).at(0).NParti_; k++)
+                for(size_t k = 0; k<Site::getNparti(); k++)
                 {
                     if(j!=k)
                     {
