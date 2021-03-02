@@ -121,13 +121,13 @@ inline void potential::BoninPot(double &dU, position &graddU, const Site *const 
     const position dif=bead->pos-ptr->pos;
     const double difNorm=dif.norm();
 dU+= (1.-3.*(dif.x.at(2)*dif.x.at(2))/(difNorm))/(pow(difNorm,1.5))+pow(SigmaBonin*SigmaBonin/difNorm,6.);
-//   dU+= (1.-3./(difNorm))/(pow(difNorm,1.5))+pow(SigmaBonin*SigmaBonin/difNorm,6.);
+
    vector<double> UsrGrad;
    vector<double> varVec;
    varVec.push_back(0.);
    varVec.push_back(0.);
-   varVec.push_back(-2*dif.x.at(2)/pow(difNorm,2.5));
+   varVec.push_back(-6*dif.x.at(2)/pow(difNorm,2.5));
    position var(varVec);
 
-   graddU=graddU+ dif*(-12*pow(SigmaBonin*SigmaBonin/difNorm,6.))/difNorm + dif*(-3)/pow(difNorm,2.5) + dif*dif.x.at(2)*dif.x.at(2)*5/pow(difNorm,3.5) + var;
+   graddU=graddU+ dif*(-12*pow(SigmaBonin*SigmaBonin/difNorm,6.))/difNorm + dif*(-3)/pow(difNorm,2.5) + dif*dif.x.at(2)*dif.x.at(2)*15/pow(difNorm,3.5) + var;
 }
