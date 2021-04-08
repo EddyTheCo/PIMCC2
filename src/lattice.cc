@@ -128,7 +128,7 @@ TVectorD *lattice::v=nullptr;
 
 
         if(!Greens)Greens=new TH2D("Greens","",5000,0,sqrt((position::L).norm()),NTimeSlices,-0.5,NTimeSlices-0.5);
-        if(!PCFUp)PCFUp=new TH1D("PCFUp","",5000,0,sqrt((position::L).norm()-(position::L).TheZ()*(position::L).TheZ()));
+        if(!PCFUp)PCFUp=new TH1D("PCFUp","",5000,0,sqrt((position::L).norm()));
         v = (TVectorD*)gDirectory->Get("v");
         if(!v)
         {
@@ -141,7 +141,7 @@ TVectorD *lattice::v=nullptr;
     else
     {
         Greens=new TH2D("Greens","",5000,0,sqrt((position::L).norm()),NTimeSlices,-0.5,NTimeSlices-0.5);
-        PCFUp=new TH1D("PCFUp","",5000,0,sqrt((position::L).norm()-(position::L).TheZ()*(position::L).TheZ()));
+        PCFUp=new TH1D("PCFUp","",5000,0,sqrt((position::L).norm()));
 
         TVectorD v(1);
         v[0]=0.;

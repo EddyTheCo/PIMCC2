@@ -354,7 +354,7 @@ inline static size_t  CalculateNoWormLenght(void)
     static bool ThereIsAWorm;
 
     static ifstream RestartPtrConf;
-    inline void readPtr(size_t &LeftPa,size_t &LeftTi,size_t & RightPa,size_t & RightTi)const
+    inline static void readPtr(size_t &LeftPa,size_t &LeftTi,size_t & RightPa,size_t & RightTi)
    {
         if(!RestartPtrConf.is_open())
         {
@@ -475,15 +475,15 @@ inline void ChangeInU(const bool & isRemove, double& dU ,double & U )const
     static size_t NpartixNT,NClose,NOpen,NWiggle,NShift,NShiftP,NWiggleP,NMove,NSwap,NInsert,NInsertP,NRemo,NRemoP,NCloseP,NOpenP,NMoveP,NSwapP;
 
 
- inline void restartRatios(void)const{
+ inline static void restartRatios(void){
      NClose=1;
      NOpen=1;NMove=1;NSwap=1;NInsert=1;NInsertP=1;NRemo=1;NRemoP=1;NCloseP=1;NOpenP=1;NMoveP=1;NSwapP=1;
  }
-    inline double fact1(const double N=1)const
+    inline static double fact1(const double N=1)
     {
         return log(4*landa*tao*pi*N)*d/2;
     }
-    inline double fact2(const double N=1) const
+    inline static double fact2(const double N=1)
     {
         return 1/(4*landa*tao*N);
     }

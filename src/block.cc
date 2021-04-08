@@ -33,6 +33,9 @@ size_t h=0;
 size_t War=Warmup;
 static size_t CorrectNpart=0;
 #endif
+
+
+
 while(step<NSweeps)
 {
 
@@ -70,6 +73,7 @@ while(step<NSweeps)
 #endif
          if(Site::ThereIsAWorm)
         {
+
 #ifdef WARMUP
                 if(!Warmup)
 #endif
