@@ -22,17 +22,13 @@ block::block(const size_t &NSweeps
 {
 
 
-
+#ifndef WARMUP
 double TSumOfdisplacement=0,TSumOfPotential=0,TNumberOfParticles=0;
-size_t TWormlenght=0,step=0,measureCounter=0,measureCounter1=0;
+size_t TWormlenght=0;
 double TWinding=0;
-
-
-#ifdef WARMUP
-size_t h=0;
-size_t War=Warmup;
-static size_t CorrectNpart=0;
 #endif
+
+size_t step=0,measureCounter=0,measureCounter1=0;
 
 
 
@@ -43,47 +39,21 @@ while(step<NSweeps)
 
 
 
-#ifdef WARMUP
-    if(!(h%1000)&&War&&isGrandCanonical)
-    {
-        if(Site::getNparti()<War)
-        {
-            Site::mu+=1;
-        }
-        if(start->NParti_>War)
-        {
-            Site::mu-=1;
-        }
-        if(start->NParti_==War)
-        {
-            CorrectNpart++;
-            if(CorrectNpart>100)
-            {
-                War=0;
-                isGrandCanonical=0;
-            }
-        }
 
-        cout<<"mu="<<Site::mu<<" eta="<<Site::eta<<" Npar="<<start->NParti_<<" C="<<CorrectNpart<<endl;
-
-
-    }
-    h++;
-
-#endif
          if(Site::ThereIsAWorm)
         {
 
-#ifdef WARMUP
-                if(!Warmup)
-#endif
-                {
+#ifndef WARMUP
+
+
+
                     measureCounter1++;
                 TWormlenght+=Site::NInactiveLinks();
 #ifdef USEROOT
                 Greens->Fill(sqrt((Site::Rbead->pos-Site::Lbead->pos).norm()),abs(1.*Site::Rbead->TimeSliceOnBead-1.*Site::Lbead->TimeSliceOnBead));
 #endif
-                }
+
+#endif
             switch ((!isGrandCanonical)?giveRanI(2):giveRanI(3)) {
             case 0:
             {
@@ -130,14 +100,14 @@ while(step<NSweeps)
         }
         else
         {
-             if(!Warmup)
-             {
+
+#ifndef WARMUP
                 TSumOfdisplacement+=Site::TEnergy;
                 TSumOfPotential+=Site::TPotential;
                 TNumberOfParticles+=Site::getNparti();
                 (d>2)?TWinding+=Site::TWinding.normxy():TWinding+=Site::TWinding.norm();
                 measureCounter++;
-             }
+#endif
 
 
              switch ((isGrandCanonical)?giveRanI(2):giveRanI(1)) {
@@ -196,22 +166,17 @@ while(step<NSweeps)
 
     }
 
-#ifdef WARMUP
-if(!Warmup)
-#endif
-{
+
+
+
+#ifndef WARMUP
         SumofDisplacement=TSumOfdisplacement/measureCounter;
         SumOfPotential=TSumOfPotential/measureCounter;
         NumberOfParticles=TNumberOfParticles/measureCounter;
         Wormlenght=1.*TWormlenght/measureCounter1;
         SumofWinding=TWinding/measureCounter;
-}
-#ifdef WARMUP
-if(!War&&Warmup)
-{
-    Warmup=0;
-}
 #endif
+
 }
 
 

@@ -42,11 +42,6 @@ const size_t lattice::NSweeps=ReadFromInput <size_t> (8);
 
 
 
-
-
-
-
-
 array<vector<Site>,10000>*  const lattice::grid=new array<vector<Site>,10000>;
 lattice::lattice()
 {
@@ -154,9 +149,9 @@ TVectorD *lattice::v=nullptr;
     if(d==3)
     hpos=new TH3D("pos","",100,-position::L.x.at(0)/2,position::L.x.at(0)/2,100,-position::L.x.at(1)/2,position::L.x.at(1)/2,100,-position::L.x.at(2)/2,position::L.x.at(2)/2);
     if(d==2)
-    hpos=new TH2D("pos","",1000,-position::L.x.at(0)/2,position::L.x.at(0)/2,1000,-position::L.x.at(1)/2,position::L.x.at(1)/2);
+    hpos=new TH2D("pos","",500,-position::L.x.at(0)/2,position::L.x.at(0)/2,500,-position::L.x.at(1)/2,position::L.x.at(1)/2);
     if(d==1)
-    hpos=new TH1D("pos","",5,-position::L.x.at(0)/2,position::L.x.at(0)/2);
+    hpos=new TH1D("pos","",500,-position::L.x.at(0)/2,position::L.x.at(0)/2);
 
 }
 #endif
@@ -177,7 +172,7 @@ void lattice::setup()const
                  grid->at(i).at(j).setPtr();
             }
     }
-
+#ifndef WARMUP
     for(size_t i=0;i<NTimeSlices;i++)
     {
 
@@ -189,77 +184,18 @@ void lattice::setup()const
 
 
     }
-
-}
-#ifdef WARMUP
-void lattice::Warm() const
-{
-
-
-    for(size_t step=0;step<NRep;step++)
-    {
-
-        const auto myBlock=block(NSweeps
-#ifdef USEROOT
-                                 ,nullptr
 #endif
-                                     );
-
-
-
-
-
-
-
-        system(("sed -i 's/^.*\\#mu\\b.*$/" + to_string(Site::mu)   + "              \\#mu/' input").c_str());
-
-
-
-        ofstream RestartConf(".restartVAR.conf");
-        ofstream RestartPtrConf(".restartPtrVAR.conf");
-
-        RestartConf<<Site::getNparti()<<" #Particles"<<endl;
-        RestartConf.precision(12);
-
-
-        for(size_t i=0;i<NTimeSlices;i++)
-        {
-
-                for(size_t j = 0; j<Site::getNparti(); j++)
-                {
-
-                    const auto var=grid->at(i).at(j);
-                    RestartConf<<var.pos;
-
-                    RestartPtrConf<<var.left->ParticleOnBead<<" "<<var.left->TimeSliceOnBead<<" "<<var.right->ParticleOnBead<<" "<<var.right->TimeSliceOnBead<<" ";
-                }
-        }
-
-        RestartConf.close();
-        RestartPtrConf.close();
-        rename(".restartVAR.conf", ".restart.conf");
-        rename(".restartPtrVAR.conf", ".restartPtr.conf");
-if(!Warmup)
-{
-    system(("sed -i 's/^.*\\#Warmup\\b.*$/" +to_string(0) +     "              \\#Warmup/' input").c_str());
-    system("sed -i '/Canonical/s/.*/Canonical       #GrandCanonical or Canonical/' input");
-    system("sed -i '/start or restart/s/.*/restart           #start or restart/' input");
-    break;
-}
-
-    }
-
-
-
 
 }
-#endif
+
+
 void lattice::move()const
 {
 
 
-
+#ifndef WARMUP
 if(!restart)thesweep<< left << setw(12) <<"KEnergy"<< left << setw(12) <<"PEnergy"<< left << setw(12) <<"TEnergy"<< left << setw(12) <<"WormLenght"<< left << setw(12) <<"SuperFlDens"<< right << setw(12) <<"NParti"<</* right << setw(12) <<"S(k,w=0)"<<*/endl;
+#endif
 
 theratios<< left << setw(12)<<"Ropen"<<left << setw(12)<<"RClose"<<left << setw(12)<<"Rmove"<<left << setw(12)<<"Rswap"<<left << setw(12)<<"RInsert"<<left << setw(12)<<"RWiggle"<<left << setw(12)<<"RShift"<<left << setw(12)<<"RRmove"<<endl;
     for(size_t step=0;step<NRep;step++)
@@ -270,25 +206,28 @@ theratios<< left << setw(12)<<"Ropen"<<left << setw(12)<<"RClose"<<left << setw(
                                  ,Greens
 #endif
                                  );
-cout<<"finished block "<<step<<endl;
+cout<<"finished block "<<step<<
+#ifdef WARMUP
+      " NPati="<<Site::getNparti()<< left << setw(12) <<getOpenRatio()<< left << setw(12) <<getCloseRatio()<< left << setw(12) <<getMoveRatio()<< left << setw(12)
+   <<getSwapRatio()<< left << setw(12) <<getInsertRatio()<< left << setw(12) <<getWiggleRatio()<< left << setw(12) <<getShiftRatio()<< left << setw(12) <<getRemoveRatio()<<
+#endif
+      endl;
             PrintConfiguration(
 #ifdef USEROOT
                         (*v)[0]+1
 #endif
   );
 
-
-
+#ifndef WARMUP
 thesweep << left << setw(12) << myBlock.getKineticEnergy()<<" "<< left << setw(12) <<myBlock.SumOfPotential/(NTimeSlices)
          <<" "<< left << setw(12) << myBlock.getKineticEnergy()+myBlock.SumOfPotential/(NTimeSlices)
           <<" "<<left << setw(12)    << myBlock.Wormlenght/(NTimeSlices-1)<<" "<<left << setw(12)    << myBlock.getSuperfluidDensity()<<" "<<right << setw(12)    <<myBlock.NumberOfParticles<</*" "<<right << setw(12)    <<StructureFactor<<*/endl;
 
 
+
        theratios<< left << setw(12) <<getOpenRatio()<< left << setw(12) <<getCloseRatio()<< left << setw(12) <<getMoveRatio()<< left << setw(12)
                 <<getSwapRatio()<< left << setw(12) <<getInsertRatio()<< left << setw(12) <<getWiggleRatio()<< left << setw(12) <<getShiftRatio()<< left << setw(12) <<getRemoveRatio()<<endl;
-
-
-
+#endif
     }
 
 #ifdef USEROOT

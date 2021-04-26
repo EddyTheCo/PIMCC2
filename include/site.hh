@@ -260,8 +260,9 @@ inline static size_t  CalculateNoWormLenght(void)
              if(Rbead->insertToLeft(var2,dU+log(eta)))
              {
                  NInsert++;
-
+#ifndef WARMUP
                  TPotential+=U;
+#endif
                  ThereIsAWorm= true;
              }
              else
@@ -344,11 +345,17 @@ inline static size_t  CalculateNoWormLenght(void)
 
 
     size_t TimeSliceOnBead,ParticleOnBead;
-    static double TEnergy,mu,TPotential,eta;
-    static position TWinding;
-    static double TEnergyVar,TPotentialVar;
-    static position TWindingVar;
+    static double mu,eta;
+    position pos,oldpos;
+    Site* left,* right,* up,* down;
+    const static potential ThePotential;
+    static size_t NpartixNT,NClose,NOpen,NWiggle,NShift,NShiftP,NWiggleP,NMove,NSwap,NInsert,NInsertP,NRemo,NRemoP,NCloseP,NOpenP,NMoveP,NSwapP;
 
+#ifndef WARMUP
+    static position TWinding;
+    static double TEnergyVar,TPotentialVar,TEnergy,TPotential;
+    static position TWindingVar;
+#endif
 
     Site* chooseTheBead(double &SumI, const size_t &vae, const Site * const startBead) const;
     static bool ThereIsAWorm;
@@ -389,6 +396,7 @@ inline static size_t  CalculateNoWormLenght(void)
 
 
     }
+#ifndef WARMUP
     inline void totalEnergy(void)const
     {
 
@@ -403,7 +411,7 @@ inline static size_t  CalculateNoWormLenght(void)
 
 
     }
-
+#endif
     inline static void MoveWorm(void)
     {        
         const auto del=giveRanI(MBar-1);
@@ -469,10 +477,6 @@ inline void ChangeInU(const bool & isRemove, double& dU ,double & U )const
 }
 
 
-    position pos,oldpos;
-    Site* left,* right,* up,* down;
-    const static potential ThePotential;
-    static size_t NpartixNT,NClose,NOpen,NWiggle,NShift,NShiftP,NWiggleP,NMove,NSwap,NInsert,NInsertP,NRemo,NRemoP,NCloseP,NOpenP,NMoveP,NSwapP;
 
 
  inline static void restartRatios(void){
@@ -604,7 +608,9 @@ inline void ChangeInU(const bool & isRemove, double& dU ,double & U )const
     }
     void printLattice(void)const
     {
+#ifndef WARMUP
         cout<<"###"<<TEnergy<<" cara"<<TPotential<<endl;
+#endif
         cout<<"NParticles="<<getNparti()<<endl;
 
         for(size_t j=0;j<getNparti();j++)

@@ -10,24 +10,9 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-if(USEROOT)
-    message( STATUS "This build is USING ROOT")
-add_definitions(-DUSEROOT)
-set(ROOT_INSTALL /home/camelud/GEANT4/ROOT/build)
-include_directories(${ROOT_INSTALL}/include)
-endif()
 
 
-if(WARMUP)
-    message( STATUS "This build is using WARMUP")
-add_definitions(-DWARMUP)
-endif()
 
-
-if(SAVECONF)
-    message( STATUS "This build will Save CONF ")
-add_definitions(-DSAVECONF)
-endif()
 if(UNIX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -g -std=c++11 -O3 -march=native")        ## Optimize
     set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
@@ -48,11 +33,33 @@ file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 
 
+
+
+
+add_executable(WARM PIMCC.cc ${sources} ${headers}  )
+target_compile_definitions(WARM PUBLIC -DWARMUP)
+
+
+if(USEROOT)
+message( STATUS "This build is USING ROOT")
+set(ROOT_INSTALL /home/camelud/GEANT4/ROOT/build)
+include_directories(${ROOT_INSTALL}/include)
+endif()
+
+
+if(SAVECONF)
+    message( STATUS "This build will Save CONF ")
+add_definitions(-DSAVECONF)
+endif()
+
 add_executable(PIMCC PIMCC.cc ${sources} ${headers}  )
 
 if(USEROOT)
 target_link_libraries(PIMCC -lstdc++ -L${ROOT_INSTALL}/lib  -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lm -ldl -rdynamic)
+target_compile_definitions(PIMCC PUBLIC -DUSEROOT)
 endif()
+
+
 #if(CMAKE_COMPILER_IS_GNUCXX)
  #   set(CMAKE_CXX_FLAGS "-O3")        ## Optimize
   #  set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
@@ -70,6 +77,7 @@ set(SCRIPTS
   RootScripts/Average.cpp
   RootScripts/rootScript.cpp
   RootScripts/PCF.cpp
+  RootScripts/StructFactor.cpp
  )
 
 foreach(_script ${SCRIPTS})

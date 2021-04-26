@@ -20,7 +20,7 @@ const double beta=ReadFromInput<double>(3);
 double Site::mu=ReadFromInput<double>(9);
 double Site::eta=ReadFromInput<double>(13);
 
-double Site::TEnergyVar=0,Site::TPotentialVar=0;
+
 
 const double variance=2*landa*tao;
 ifstream Site::RestartPtrConf(".restartPtr.conf");
@@ -28,11 +28,15 @@ Site* Site::theZeta=nullptr;
 const size_t NTimeSlices=beta/tao;
 const size_t MBar=(ReadFromInput<size_t>(15)<1||ReadFromInput<size_t>(15)>NTimeSlices)?NTimeSlices:ReadFromInput<size_t>(15);
 
+#ifndef WARMUP
 double Site::TEnergy=0,Site::TPotential=0;
+double Site::TEnergyVar=0,Site::TPotentialVar=0;
+
+position Site::TWinding=position(0.);
+position Site::TWindingVar=position(0.);
+#endif
 
 const potential Site::ThePotential=potential();
-
-
 
 
 bool Site::ThereIsAWorm=false;
@@ -40,8 +44,7 @@ array<vector<Site>,10000>* Site::theParticles=nullptr;
 
 Site* Site::Lbead=nullptr;
 Site* Site::Rbead=nullptr;
-position Site::TWinding=position(0.);
-position Site::TWindingVar=position(0.);
+
 size_t Site::NClose=1,Site::NOpen=1,Site::NMove=1,Site::NWiggle=1,Site::NWiggleP=1,Site::NShift=1,Site::NShiftP=1,Site::NSwap=1,Site::NCloseP=1,Site::NOpenP=1,Site::NMoveP=1,Site::NSwapP=1,Site::NInsertP=1,Site::NInsert=1,Site::NRemoP=1,Site::NRemo=1;
 
 Site::Site(const size_t i, const size_t j, const position var, const bool act):active(act),pos(var),oldpos(pos),TimeSliceOnBead(j),ParticleOnBead(i),left(nullptr),right(nullptr),up(nullptr),down(nullptr)
@@ -69,10 +72,12 @@ bool Site::OpenWorm(const size_t step, const size_t ab, double dU, const positio
         {
             Lbead=this;
             right->active=false;
+#ifndef WARMUP
             const auto Dist=pos-right->pos;
             TEnergy-=Dist.norm();
             TWinding=TWinding+Dist;
             TPotential-=U;
+#endif
             return true;
         }
         return false;
@@ -84,9 +89,11 @@ bool Site::OpenWorm(const size_t step, const size_t ab, double dU, const positio
 
         if(eta*getNparti()/(propagator(start,right->pos,ab,-dU)*position::volumen)>giveRanD(1.))
         {
+#ifndef WARMUP
             const auto Dist=pos-right->pos;
             TEnergy-=Dist.norm();
             TWinding=TWinding+Dist;
+#endif
             Rbead=this->right;
             ThereIsAWorm=true;
             Lbead=this;
@@ -114,11 +121,12 @@ bool Site::CloseWorm(double dU)
         if(right->CloseWorm(dU))
         {
             right->active=true;
+#ifndef WARMUP
             const auto Dist=right->pos-pos;
             TEnergy+=Dist.norm();
             TWinding=TWinding+Dist;
             TPotential+=U;
-
+#endif
             return true;
 
         }
@@ -129,9 +137,11 @@ bool Site::CloseWorm(double dU)
     {
         if(propagator(Lbead->pos,Rbead->pos,NInactiveLinks(),dU)*position::getVolumen()/(eta*getNparti())>giveRanD(1.))
         {
+#ifndef WARMUP
             const auto Dist=right->pos-pos;
             TEnergy+=Dist.norm();
             TWinding=TWinding+Dist;
+#endif
             Rbead=nullptr;
             Lbead=nullptr;
             ThereIsAWorm=false;
@@ -148,13 +158,17 @@ right->oldpos=right->pos;
 
     if(this->TimeSliceOnBead!=Rbead->left->TimeSliceOnBead)
     {
+#ifndef WARMUP
         const auto Dist=oldpos-right->pos;
         TEnergyVar-=Dist.norm();
         TWindingVar=TWindingVar+Dist;
+#endif
         double U=0;
-        right->ChangeInU(true,dU,U);
 
+        right->ChangeInU(true,dU,U);
+#ifndef WARMUP
         TPotentialVar+=U;
+#endif
 
         right->pos=position(true,this);
 
@@ -163,10 +177,12 @@ right->oldpos=right->pos;
 
         if(right->Wiggle(dU))
         {
+#ifndef WARMUP
             const auto Dist=right->pos-pos;
             TEnergy+=Dist.norm();
             TWinding=TWinding+Dist;
             TPotential+=U;
+#endif
 
             return true;
         }
@@ -175,28 +191,35 @@ right->oldpos=right->pos;
     }
     else
     {
+#ifndef WARMUP
         const auto Dist=oldpos-right->pos;
         TEnergyVar-=Dist.norm();
         TWindingVar=TWindingVar+Dist;
+#endif
 
         if(exp(dU)>giveRanD(1.))
         {
             NWiggle++;
+#ifndef WARMUP
             TPotential-=TPotentialVar;
             const auto Dist=right->pos-pos;
             TEnergy+=TEnergyVar+Dist.norm();
             TWinding=TWinding+TWindingVar+Dist;
+#endif
             Lbead=nullptr;
             Rbead=nullptr;
+#ifndef WARMUP
             TPotentialVar=0;
             TEnergyVar=0;
             TWindingVar=position(0);
+#endif
             return true;
         }
+#ifndef WARMUP
         TPotentialVar=0;
         TEnergyVar=0;
         TWindingVar=position(0);
-
+#endif
         return false;
     }
 }
@@ -216,10 +239,12 @@ ChangeInU(true,dU,U);
             if(right->deleteToRight(step-1,dU))
             {
                 active=false;
+#ifndef WARMUP
                 const auto Dist=pos-right->pos;
                 TEnergy-=Dist.norm();
                 TWinding=TWinding+Dist;
                 TPotential-=U;
+#endif
                 return true;
             }
             return false;
@@ -233,14 +258,16 @@ ChangeInU(true,dU,U);
 
             if(exp(dU)>giveRanD(1.))
             {
+#ifndef WARMUP
                 if(this!=Lbead)
                 {
                     const auto Dist=pos-right->pos;
                     TEnergy-=Dist.norm();
                     TWinding=TWinding+Dist;
                 }
-                active=false;
                 TPotential-=U;
+#endif
+                active=false;
                 Rbead=this->right;
                 NMove++;
                 return true;
@@ -261,10 +288,12 @@ ChangeInU(true,dU,U);
                 if(left->deleteToLeft(step-1,dU))
                 {
                     active=false;
+#ifndef WARMUP
                     const auto Dis=left->pos-pos;
                     TEnergy-=Dis.norm();
                     TWinding=TWinding+Dis;
                     TPotential-=U;
+#endif
                     return true;
                 }
                 return false;
@@ -276,10 +305,12 @@ ChangeInU(true,dU,U);
                 if(exp(dU)>giveRanD(1.))
                 {
                     active=false;
+#ifndef WARMUP
                     TPotential-=U;
                     const auto Dis=left->pos-pos;
                     TEnergy-=Dis.norm();
                     TWinding=TWinding+Dis;
+#endif
                     Lbead=this->left;
                     NMove++;
                     return true;
@@ -318,10 +349,12 @@ right->ChangeInU(false,dU,U);
                 if(right->insertToRight(step-1,dU))
                 {
                     right->active=true;
+#ifndef WARMUP
                     const auto Dis=right->pos-pos;
                     TEnergy+=Dis.norm();
                     TWinding=TWinding+Dis;
                     TPotential+=U;
+#endif
                     return true;
                 }
                 return false;
@@ -334,10 +367,12 @@ right->ChangeInU(false,dU,U);
                 if(exp(dU)>giveRanD(1.))
                 {
                     right->active=true;
+#ifndef WARMUP
                     const auto Dis=right->pos-pos;
                     TEnergy+=Dis.norm();
                     TWinding=TWinding+Dis;
                     TPotential+=U;
+#endif
                     Lbead=this->right;
                     if(aParticleisInserted)
                     {
@@ -397,13 +432,12 @@ dU+=mu*tao;
                 if(left->insertToLeft(step-1,dU))
                 {
                     left->active=true;
+#ifndef WARMUP
                     const auto Dis=pos-left->pos;
                     TEnergy+=Dis.norm();
-
-
                     TWinding=TWinding+Dis;
-
                     TPotential+=U;
+#endif
                     return true;
                 }
                 return false;
@@ -416,13 +450,12 @@ dU+=mu*tao;
                 if(exp(dU)>giveRanD(1.))
                 {
                     left->active=true;
+#ifndef WARMUP
                     const auto Dis=pos-left->pos;
                     TEnergy+=Dis.norm();
-
-
                     TWinding=TWinding+Dis;
-
                     TPotential+=U;
+#endif
                     Rbead=this->left;
                     if(aParticleisInserted)
                     {
@@ -528,13 +561,14 @@ if(isRight)
         {
             this->right->active=true;
             zeta->right->active=false;
+#ifndef WARMUP
             const auto Dist1=right->pos-pos;
             const auto Dist2=zeta->pos-zeta->right->pos;
             TEnergy+=Dist1.norm()-Dist2.norm();
             TWinding=TWinding+Dist1+Dist2;
             TPotential+=Ualpha;
             TPotential-=Uzeta;
-
+#endif
             return true;
         }
 
@@ -548,10 +582,12 @@ if(isRight)
          {
              Site* const prev=this->right;
              this->right=zeta->right;
+#ifndef WARMUP
              const auto Dist1=right->pos-pos;
              const auto Dist2=zeta->pos-zeta->right->pos;
              TEnergy+=Dist1.norm()-Dist2.norm();
              TWinding=TWinding+Dist1+Dist2;
+#endif
             zeta->right=prev;
             zeta->right->left=zeta;
             this->right->left=this;
@@ -621,13 +657,14 @@ else {
         {
             this->left->active=true;
             zeta->left->active=false;
+#ifndef WARMUP
             const auto Dist1=pos-left->pos;
             const auto Dist2=zeta->left->pos-zeta->pos;
             TEnergy+=Dist1.norm()-Dist2.norm();
             TWinding=TWinding+Dist1+Dist2;
             TPotential+=Ualpha;
             TPotential-=Uzeta;
-
+#endif
             return true;
         }
 
@@ -641,10 +678,12 @@ else {
         {
              Site * const prev=this->left;
              this->left=zeta->left;
+#ifndef WARMUP
              const auto Dist1=pos-left->pos;
              const auto Dist2=zeta->left->pos-zeta->pos;
              TEnergy+=Dist1.norm()-Dist2.norm();
              TWinding=TWinding+Dist1+Dist2;
+#endif
             zeta->left=prev;
             zeta->left->right=zeta;
             this->left->right=this;
@@ -689,8 +728,9 @@ bool Site::shiftParticle(double dU, const position& shift)const
 
     double U=0;
     right->ChangeInU(true,dU,U);
+#ifndef WARMUP
     TPotentialVar+=U;
-
+#endif
     //cout<<"right="<<right->ParticleOnBead<<" "<<right->TimeSliceOnBead<<" "<<right->pos<<endl;
     right->pos=right->pos+shift;
     //cout<<"right="<<right->ParticleOnBead<<" "<<right->TimeSliceOnBead<<" "<<right->pos<<endl;
@@ -701,7 +741,9 @@ bool Site::shiftParticle(double dU, const position& shift)const
 
             if(right->shiftParticle(dU,shift))
             {
+#ifndef WARMUP
                 TPotential+=U;
+#endif
                 //cout<<oldpos-right->oldpos<<" "<<pos-right->pos<<endl;
                 return true;
             }
@@ -715,14 +757,18 @@ bool Site::shiftParticle(double dU, const position& shift)const
             if(exp(dU)>giveRanD(1.))
             {
                 NShift++;
+#ifndef WARMUP
                 TPotential+=U;
                 TPotential-=TPotentialVar;
                 TPotentialVar=0.;
+#endif
                 //cout<<oldpos-right->oldpos<<" "<<pos-right->pos<<endl;
                return true;
             }
             right->pos=right->oldpos;
+#ifndef WARMUP
             TPotentialVar=0.;
+#endif
             return false;
         }
 

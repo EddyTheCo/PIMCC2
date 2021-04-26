@@ -32,9 +32,7 @@ public:
 
     void setup()const;
     void move()const;
-#ifdef WARMUP
-    void Warm() const;
-#endif
+
      void PrintConfiguration (
         #ifdef USEROOT
         const size_t step
