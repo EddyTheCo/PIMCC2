@@ -208,7 +208,7 @@ theratios<< left << setw(12)<<"Ropen"<<left << setw(12)<<"RClose"<<left << setw(
                                  );
 cout<<"finished block "<<step<<
 #ifdef WARMUP
-      " NPati="<<Site::getNparti()<< left << setw(12) <<getOpenRatio()<< left << setw(12) <<getCloseRatio()<< left << setw(12) <<getMoveRatio()<< left << setw(12)
+      " NPati="<<Site::getNparti()<<" "<< left << setw(12) <<getOpenRatio()<< left << setw(12) <<getCloseRatio()<< left << setw(12) <<getMoveRatio()<< left << setw(12)
    <<getSwapRatio()<< left << setw(12) <<getInsertRatio()<< left << setw(12) <<getWiggleRatio()<< left << setw(12) <<getShiftRatio()<< left << setw(12) <<getRemoveRatio()<<
 #endif
       endl;
