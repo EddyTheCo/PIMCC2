@@ -195,9 +195,10 @@ void lattice::move()const
 
 #ifndef WARMUP
 if(!restart)thesweep<< left << setw(12) <<"KEnergy"<< left << setw(12) <<"PEnergy"<< left << setw(12) <<"TEnergy"<< left << setw(12) <<"WormLenght"<< left << setw(12) <<"SuperFlDens"<< right << setw(12) <<"NParti"<</* right << setw(12) <<"S(k,w=0)"<<*/endl;
+theratios<< left << setw(12)<<"Ropen"<<left << setw(12)<<"RClose"<<left << setw(12)<<"Rmove"<<left << setw(12)<<"Rswap"<<left << setw(12)<<"RInsert"<<left << setw(12)<<"RWiggle"<<left << setw(12)<<"RShift"<<left << setw(12)<<"RRmove"<<endl;
 #endif
 
-theratios<< left << setw(12)<<"Ropen"<<left << setw(12)<<"RClose"<<left << setw(12)<<"Rmove"<<left << setw(12)<<"Rswap"<<left << setw(12)<<"RInsert"<<left << setw(12)<<"RWiggle"<<left << setw(12)<<"RShift"<<left << setw(12)<<"RRmove"<<endl;
+
     for(size_t step=0;step<NRep;step++)
     {
 
