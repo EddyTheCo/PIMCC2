@@ -61,11 +61,8 @@ while(step<NSweeps)
                     Site::NCloseP++;
                     if(!(Site::cantClose(MBar)))
                     {
-                    if(Site::Lbead->CloseWorm(0))
-                    {
-                        step++;
+                        Site::Lbead->CloseWorm(0);
 
-                    }
                     }
                 break;
             }
@@ -113,7 +110,7 @@ while(step<NSweeps)
              switch ((isGrandCanonical)?giveRanI(2):giveRanI(1)) {
              case 0:
              {
-
+                step++;
                if(Site::getNparti())
                {
                   // cout<<"OpenWorm"<<endl;
