@@ -106,10 +106,10 @@ while(step<NSweeps)
              case 0:
              {
                 step++;
+                Site::NOpenP++;
                if(Site::getNparti()&&step<NSweeps)
                {
                   // cout<<"OpenWorm"<<endl;
-                   Site::NOpenP++;
                    const size_t posiTimes=giveRanI(NTimeSlices-1) ;
                    const size_t posiParti=giveRanI(Site::getNparti() -1);
                    const size_t var2=  giveRanI(MBar-2);
