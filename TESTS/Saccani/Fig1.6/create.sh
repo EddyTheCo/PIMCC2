@@ -35,7 +35,7 @@ $beta              #beta
 $landa              #landa
 100000            #OfBlocks
 2               #dimension
-11.855 10.267  #L d numbers
+4.795831523 4.795831523  #L d numbers
 100           #NumberOfsweepsInABlock
 $mu            #mu
 start           #start or restart
